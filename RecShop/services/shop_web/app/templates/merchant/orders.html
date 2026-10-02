@@ -1,0 +1,109 @@
+{% extends "merchant/base.html" %}
+
+{% block title %}Order Management{% endblock %}
+{% block header_title %}Order Management{% endblock %}
+
+{% block content %}
+<h1 class="page-title">My Orders</h1>
+
+<!-- Status tabs -->
+<div class="status-tabs">
+    <a href="{{ url_for('merchant.orders') }}" class="{% if not status_filter %}active{% endif %}">
+        All ({{ status_counts.all }})
+    </a>
+    <a href="{{ url_for('merchant.orders', status='paid') }}" class="{% if status_filter == 'paid' %}active{% endif %}">
+        Pending Shipment ({{ status_counts.paid }})
+    </a>
+    <a href="{{ url_for('merchant.orders', status='shipped') }}" class="{% if status_filter == 'shipped' %}active{% endif %}">
+        Shipped ({{ status_counts.shipped }})
+    </a>
+    <a href="{{ url_for('merchant.orders', status='completed') }}" class="{% if status_filter == 'completed' %}active{% endif %}">
+        Completed ({{ status_counts.completed }})
+    </a>
+    <a href="{{ url_for('merchant.orders', status='cancelled') }}" class="{% if status_filter == 'cancelled' %}active{% endif %}">
+        Cancelled ({{ status_counts.cancelled }})
+    </a>
+</div>
+
+<!-- Orders table -->
+<div class="card" style="padding: 0; overflow-x: auto;">
+    {% if orders %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Order No.</th>
+                <th>Buyer</th>
+                <th>Amount</th>
+                <th>Items</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td style="font-family:monospace;font-size:.85rem;">{{ order.order_no }}</td>
+                <td>{{ order.snapshot_receiver_name }}</td>
+                <td style="font-weight:600;">${{ "%.2f"|format(order.total_amount) }}</td>
+                <td>{{ order.item_count }}</td>
+                <td>
+                    {% set status_map = {'pending':'Pending Payment','paid':'Pending Shipment','shipped':'Shipped','completed':'Completed','cancelled':'Cancelled'} %}
+                    {% set badge_map = {'pending':'pending','paid':'pending','shipped':'active','completed':'active','cancelled':'removed'} %}
+                    <span class="badge badge-{{ badge_map.get(order.status, 'draft') }}">
+                        {{ status_map.get(order.status, order.status) }}
+                    </span>
+                </td>
+                <td style="font-size:.85rem;color:#95a5a6;">
+                    {{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else '-' }}
+                </td>
+                <td>
+                    <div style="display:flex;gap:.3rem;">
+                        <a href="{{ url_for('merchant.order_detail', order_no=order.order_no) }}" class="btn btn-outline btn-sm">Details</a>
+                        {% if order.status == 'paid' %}
+                        <button class="btn btn-success btn-sm" onclick="shipOrder('{{ order.order_no }}')">Ship</button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align:center;padding:3rem;color:#95a5a6;">
+        <p style="font-size:1rem;font-weight:600;">Orders</p>
+        <p>No orders yet</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Pagination -->
+{% if total_pages > 1 %}
+<div class="pagination">
+    {% if page > 1 %}
+    <a href="{{ url_for('merchant.orders', status=status_filter, page=page-1) }}">Previous</a>
+    {% endif %}
+    {% for p in range(1, total_pages + 1) %}
+    <a href="{{ url_for('merchant.orders', status=status_filter, page=p) }}" 
+       class="{% if p == page %}active{% endif %}">{{ p }}</a>
+    {% endfor %}
+    {% if page < total_pages %}
+    <a href="{{ url_for('merchant.orders', status=status_filter, page=page+1) }}">Next</a>
+    {% endif %}
+</div>
+{% endif %}
+
+<script>
+async function shipOrder(orderNo) {
+    if (!confirm('Confirm shipment?')) return;
+    try {
+        const resp = await fetch(`/merchant/api/orders/${orderNo}/ship`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'}
+        });
+        const data = await resp.json();
+        if (data.success) { location.reload(); }
+        else { alert(data.message || 'Operation failed'); }
+    } catch (e) { alert('Network error'); }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+{% block title %}Admin Accounts{% endblock %}
+{% block header_title %}Admin Account Management{% endblock %}
+{% block content %}
+<h1 class="page-title">Admin Account Management</h1>
+<div class="card">
+    <h3 style="margin-bottom:8px;">Create Admin</h3>
+    <form method="POST" action="{{ url_for('admin.admin_create') }}" class="filters">
+        <input name="username" placeholder="Username" required>
+        <input name="email" placeholder="Email (optional)">
+        <select name="role">
+            <option value="operation">operation</option>
+            <option value="finance">finance</option>
+            <option value="customer_service">customer_service</option>
+            <option value="super_admin">super_admin</option>
+        </select>
+        <button class="btn btn-primary">Create</button>
+    </form>
+</div>
+<form class="filters" method="GET">
+    <input name="q" value="{{ q }}" placeholder="Search username/email">
+    <button class="btn">Search</button>
+</form>
+<div class="card table-wrap">
+    <table>
+        <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for a in admins %}
+            <tr>
+                <td>{{ a.id }}</td>
+                <td>{{ a.username }}</td>
+                <td>{{ a.email or '-' }}</td>
+                <td>{{ a.role }}</td>
+                <td><span class="badge b-{{ 'active' if a.status=='active' else 'rejected' }}">{{ a.status }}</span></td>
+                <td>{{ a.last_login_at.strftime('%Y-%m-%d %H:%M') if a.last_login_at else '-' }}</td>
+                <td>
+                    <button class="btn btn-sm" onclick="toggleStatus({{ a.id }})">Disable/Enable</button>
+                    <button class="btn btn-sm btn-warning" onclick="resetPwd({{ a.id }})">Reset Password</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if total_pages > 1 %}
+<div class="pagination">
+{% for p in range(1,total_pages+1) %}
+<a class="{% if p==page %}active{% endif %}" href="{{ url_for('admin.admins', q=q, page=p) }}">{{ p }}</a>
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script>
+async function toggleStatus(id){
+  const resp=await fetch(`/admin/api/admins/${id}/toggle-status`,{method:'POST'});
+  const data=await resp.json();
+  if(data.success){location.reload();}else{alert(data.message||'Operation failed');}
+}
+async function resetPwd(id){
+  const resp=await fetch(`/admin/api/admins/${id}/reset-password`,{method:'POST'});
+  const data=await resp.json();
+  if(data.success){alert('New password: '+data.new_password);}else{alert(data.message||'Operation failed');}
+}
+</script>
+{% endblock %}

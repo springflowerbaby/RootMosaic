@@ -1,0 +1,45 @@
+{% extends "merchant/base.html" %}
+{% block title %}Sales Analytics{% endblock %}
+{% block header_title %}Sales Analytics{% endblock %}
+{% block content %}
+<h1 class="page-title">Sales Trend</h1>
+<div class="card" style="display:flex;gap:.6rem;">
+    <a class="btn {% if days==7 %}btn-primary{% else %}btn-outline{% endif %}" href="{{ url_for('merchant.stats', days=7) }}">Last 7 Days</a>
+    <a class="btn {% if days==14 %}btn-primary{% else %}btn-outline{% endif %}" href="{{ url_for('merchant.stats', days=14) }}">Last 14 Days</a>
+    <a class="btn {% if days==30 %}btn-primary{% else %}btn-outline{% endif %}" href="{{ url_for('merchant.stats', days=30) }}">Last 30 Days</a>
+</div>
+<div class="card" style="padding:0;overflow-x:auto;">
+    <table class="data-table">
+        <thead><tr><th>Date</th><th>Orders</th><th>Sales</th></tr></thead>
+        <tbody>
+            {% for row in trend_rows %}
+            <tr>
+                <td>{{ row.d }}</td>
+                <td>{{ row.orders }}</td>
+                <td>${{ "%.2f"|format(row.sales) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" style="text-align:center;color:#95a5a6;">No trend data</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h2 class="page-title" style="font-size:1.1rem;">Top 10 Products</h2>
+<div class="card" style="padding:0;overflow-x:auto;">
+    <table class="data-table">
+        <thead><tr><th>Product</th><th>Sold Qty</th><th>Sales</th></tr></thead>
+        <tbody>
+            {% for row in top_rows %}
+            <tr>
+                <td>{{ row.title or row.item_id }}</td>
+                <td>{{ row.sold_qty }}</td>
+                <td>${{ "%.2f"|format(row.sales) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" style="text-align:center;color:#95a5a6;">No sales data</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

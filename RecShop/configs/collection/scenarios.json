@@ -1,0 +1,642 @@
+{
+  "design_version": "rq4-composition-proposal-20260916-v1",
+  "scenarios": [
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S01",
+      "atoms": [
+        "network_delay@catalog-gw"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S02",
+      "atoms": [
+        "network_loss@catalog-gw"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S03",
+      "atoms": [
+        "service_unavailable@catalog"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S04",
+      "atoms": [
+        "service_cpu_saturation@catalog"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S05",
+      "atoms": [
+        "host_cpu_saturation@host"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S06",
+      "atoms": [
+        "db_table_lock@mysql_items_lock"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S07",
+      "atoms": [
+        "runtime_exception@catalog"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S08",
+      "atoms": [
+        "dependency_latency@catalog"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S09",
+      "atoms": [
+        "service_cpu_saturation@order"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S10",
+      "atoms": [
+        "service_cpu_saturation@cart"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S11",
+      "atoms": [
+        "service_cpu_saturation@review-query"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S12",
+      "atoms": [
+        "service_cpu_saturation@backend"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S13",
+      "atoms": [
+        "service_cpu_saturation@checkout"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S14",
+      "atoms": [
+        "service_unavailable@order"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S15",
+      "atoms": [
+        "service_unavailable@cart"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S16",
+      "atoms": [
+        "service_unavailable@review-query"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S17",
+      "atoms": [
+        "service_unavailable@backend"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S18",
+      "atoms": [
+        "service_unavailable@checkout"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S19",
+      "atoms": [
+        "service_unavailable@search"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S20",
+      "atoms": [
+        "service_cpu_saturation@rec-agent"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S21",
+      "atoms": [
+        "network_delay@rec-agent"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S22",
+      "atoms": [
+        "service_unavailable@rec-agent"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S23",
+      "atoms": [
+        "retry_policy_misconfiguration@catalog-gw"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S24",
+      "atoms": [
+        "timeout_misconfiguration@catalog-gw"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S25",
+      "atoms": [
+        "dependency_latency@inventory"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S26",
+      "atoms": [
+        "service_unavailable@user"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S27",
+      "atoms": [
+        "service_cpu_saturation@sasrec"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S28",
+      "atoms": [
+        "service_cpu_saturation@pricing"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D01",
+      "atoms": [
+        "dependency_latency@inventory",
+        "retry_policy_misconfiguration@catalog-gw"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D02",
+      "atoms": [
+        "network_loss@catalog-gw",
+        "db_table_lock@mysql_items_lock"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D03",
+      "atoms": [
+        "host_cpu_saturation@host",
+        "service_cpu_saturation@catalog"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D04",
+      "atoms": [
+        "service_unavailable@catalog",
+        "service_unavailable@user"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D05",
+      "atoms": [
+        "service_unavailable@catalog",
+        "timeout_misconfiguration@catalog-gw"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D06",
+      "atoms": [
+        "host_cpu_saturation@host",
+        "timeout_misconfiguration@catalog-gw"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D07",
+      "atoms": [
+        "dependency_latency@inventory",
+        "network_delay@catalog-gw"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D08",
+      "atoms": [
+        "network_delay@catalog-gw",
+        "service_unavailable@user"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D09",
+      "atoms": [
+        "service_cpu_saturation@sasrec",
+        "network_delay@catalog-gw"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D10",
+      "atoms": [
+        "db_table_lock@mysql_items_lock",
+        "network_delay@catalog-gw"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D11",
+      "atoms": [
+        "dependency_latency@inventory",
+        "runtime_exception@catalog"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D12",
+      "atoms": [
+        "dependency_latency@catalog",
+        "timeout_misconfiguration@catalog-gw"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D13",
+      "atoms": [
+        "dependency_latency@catalog",
+        "network_loss@catalog-gw"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D14",
+      "atoms": [
+        "network_delay@catalog-gw",
+        "service_cpu_saturation@catalog"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D15",
+      "atoms": [
+        "dependency_latency@catalog",
+        "service_cpu_saturation@pricing"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D16",
+      "atoms": [
+        "network_delay@catalog-gw",
+        "service_unavailable@catalog"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D17",
+      "atoms": [
+        "service_unavailable@checkout",
+        "dependency_latency@inventory"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D18",
+      "atoms": [
+        "service_cpu_saturation@cart",
+        "service_cpu_saturation@order"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D19",
+      "atoms": [
+        "service_unavailable@search",
+        "service_cpu_saturation@review-query"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D20",
+      "atoms": [
+        "service_cpu_saturation@rec-agent",
+        "service_cpu_saturation@backend"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D21",
+      "atoms": [
+        "service_unavailable@user",
+        "service_cpu_saturation@backend"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D22",
+      "atoms": [
+        "service_cpu_saturation@pricing",
+        "timeout_misconfiguration@catalog-gw"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D23",
+      "atoms": [
+        "service_cpu_saturation@cart",
+        "service_cpu_saturation@pricing"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D24",
+      "atoms": [
+        "service_cpu_saturation@cart",
+        "service_unavailable@checkout"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D25",
+      "atoms": [
+        "service_cpu_saturation@pricing",
+        "service_unavailable@checkout"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D26",
+      "atoms": [
+        "network_delay@catalog-gw",
+        "service_cpu_saturation@backend"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D27",
+      "atoms": [
+        "service_cpu_saturation@backend",
+        "service_cpu_saturation@sasrec"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D28",
+      "atoms": [
+        "network_delay@rec-agent",
+        "service_cpu_saturation@sasrec"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D29",
+      "atoms": [
+        "network_delay@rec-agent",
+        "service_unavailable@catalog"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D30",
+      "atoms": [
+        "service_cpu_saturation@sasrec",
+        "service_unavailable@catalog"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D31",
+      "atoms": [
+        "service_cpu_saturation@catalog",
+        "service_cpu_saturation@review-query"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D32",
+      "atoms": [
+        "service_cpu_saturation@catalog",
+        "service_unavailable@order"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D33",
+      "atoms": [
+        "service_cpu_saturation@review-query",
+        "service_unavailable@order"
+      ],
+      "G": 2,
+      "fault_count": 2
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "T01",
+      "atoms": [
+        "service_cpu_saturation@pricing",
+        "dependency_latency@catalog",
+        "timeout_misconfiguration@catalog-gw"
+      ],
+      "G": 3,
+      "fault_count": 3
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "T05",
+      "atoms": [
+        "service_unavailable@checkout",
+        "service_cpu_saturation@cart",
+        "service_cpu_saturation@pricing"
+      ],
+      "G": 3,
+      "fault_count": 3
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "T06",
+      "atoms": [
+        "service_cpu_saturation@backend",
+        "service_cpu_saturation@sasrec",
+        "network_delay@catalog-gw"
+      ],
+      "G": 3,
+      "fault_count": 3
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "T07",
+      "atoms": [
+        "network_delay@rec-agent",
+        "service_cpu_saturation@sasrec",
+        "service_unavailable@catalog"
+      ],
+      "G": 3,
+      "fault_count": 3
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "T08",
+      "atoms": [
+        "service_unavailable@order",
+        "service_cpu_saturation@review-query",
+        "service_cpu_saturation@catalog"
+      ],
+      "G": 3,
+      "fault_count": 3
+    }
+  ]
+}

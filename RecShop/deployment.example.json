@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "instance_id": "recshop-demo",
+  "context": "YOUR_KUBERNETES_CONTEXT",
+  "namespace": "recshop-demo",
+  "kubectl": [
+    "kubectl"
+  ],
+  "images": {
+    "rec-agent": "recweb-rec-agent:latest",
+    "llm-rerank": "recweb-llm-rerank:latest",
+    "user": "recweb-user:latest",
+    "address": "recweb-address:latest",
+    "ai-memory": "recweb-ai-memory:latest",
+    "announcement": "recweb-announcement:latest",
+    "catalog": "recweb-catalog:latest",
+    "search": "recweb-search:latest",
+    "review-query": "recweb-review-query:latest",
+    "merchant": "recweb-merchant:latest",
+    "interaction": "recweb-interaction:latest",
+    "sasrec": "recweb-sasrec:latest",
+    "notification": "recweb-notification:latest",
+    "admin-audit": "recweb-admin-audit:latest",
+    "backend": "recweb-backend:latest",
+    "review": "recweb-review:latest",
+    "shop-web": "recweb-shop-web:latest",
+    "cart": "recweb-cart:latest",
+    "order": "recweb-order:latest",
+    "checkout": "recweb-checkout:latest",
+    "payment": "recweb-payment:latest",
+    "inventory": "recweb-inventory:latest",
+    "pricing": "recweb-pricing:latest",
+    "promotion": "recweb-promotion:latest",
+    "shipping": "recweb-shipping:latest"
+  },
+  "assets": {
+    "local_dir": "./local-assets",
+    "files": {
+      "model": {
+        "name": "SASRec-Feb-24-2026_17-54-22.pth",
+        "sha256": null
+      },
+      "cache": {
+        "name": "standard_cache.pkl",
+        "sha256": null
+      },
+      "items": {
+        "name": "electronics.item",
+        "sha256": null
+      }
+    },
+    "storage": "20Gi",
+    "storage_class": null,
+    "helper_image": "python:3.10-slim"
+  },
+  "database": {
+    "image": "mysql:8.0",
+    "storage": "5Gi",
+    "storage_class": null
+  },
+  "secrets": {
+    "db_password_env": "RECSHOP_DB_PASSWORD",
+    "db_root_password_env": "RECSHOP_DB_ROOT_PASSWORD",
+    "flask_secret_env": "RECSHOP_FLASK_SECRET",
+    "llm_key_env": null
+  },
+  "observability": {
+    "enabled": false
+  },
+  "timeouts": {
+    "command_seconds": 60,
+    "rollout_seconds": 900,
+    "asset_copy_seconds": 1800
+  },
+  "resources": {
+    "rec-agent": {
+      "requests": {
+        "memory": "2Gi"
+      },
+      "limits": {
+        "memory": "4Gi"
+      }
+    }
+  }
+}

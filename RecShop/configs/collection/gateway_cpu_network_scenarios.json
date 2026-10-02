@@ -1,0 +1,33 @@
+{
+  "design_version": "rq4-d06-15ms-incremental-20260929-v1",
+  "scenarios": [
+    {
+      "design_version": "rq4-d06-15ms-incremental-20260929-v1",
+      "scenario_id": "S29",
+      "atoms": [
+        "host_cpu_saturation@host"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-d06-15ms-incremental-20260929-v1",
+      "scenario_id": "S30",
+      "atoms": [
+        "timeout_misconfiguration@catalog-gw"
+      ],
+      "G": 1,
+      "fault_count": 1
+    },
+    {
+      "design_version": "rq4-d06-15ms-incremental-20260929-v1",
+      "scenario_id": "D34",
+      "atoms": [
+        "host_cpu_saturation@host",
+        "timeout_misconfiguration@catalog-gw"
+      ],
+      "G": 2,
+      "fault_count": 2
+    }
+  ]
+}

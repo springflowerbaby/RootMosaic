@@ -1,0 +1,371 @@
+/* ============================================================
+   AI Picks Page Styles
+   ============================================================ */
+
+/* Hero Section */
+.ai-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #fff;
+    padding: 4rem 0 3.5rem;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.ai-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.4rem 1.2rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+}
+
+.ai-hero h1 {
+    color: #fff;
+    font-size: 2.8rem;
+    margin-bottom: 0.8rem;
+    letter-spacing: -1px;
+}
+
+.ai-hero p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    max-width: 550px;
+    margin: 0 auto;
+}
+
+/* Error State */
+.ai-error {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--light-gray);
+    border-radius: 12px;
+    margin-bottom: 3rem;
+}
+
+.error-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: #f8d7da;
+    color: #dc3545;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.ai-error p {
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+}
+
+.btn-sm {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+/* Section Labels */
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.label-icon {
+    font-size: 1.2rem;
+}
+
+.source-tag {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 0.5rem;
+}
+
+.tag-llm {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.tag-fallback {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.tag-model {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+/* ============================================================
+   Top Pick Card
+   ============================================================ */
+.ai-top-pick-section {
+    margin-bottom: 3.5rem;
+}
+
+.top-pick-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+}
+
+.top-pick-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.top-pick-image-link {
+    display: block;
+}
+
+.top-pick-image {
+    position: relative;
+    padding-bottom: 100%;
+    background: var(--light-gray);
+    overflow: hidden;
+}
+
+.top-pick-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.top-pick-card:hover .top-pick-image img {
+    transform: scale(1.03);
+}
+
+.top-pick-info {
+    padding: 2.5rem 2.5rem 2.5rem 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.top-pick-category {
+    font-size: 0.75rem;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 0.5rem;
+}
+
+.top-pick-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 0.4rem;
+}
+
+.top-pick-name a:hover {
+    color: #0f3460;
+}
+
+.top-pick-brand {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin-bottom: 0.8rem;
+}
+
+.top-pick-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+.top-pick-price .currency {
+    font-size: 1rem;
+    font-weight: 500;
+    vertical-align: super;
+}
+
+/* AI Reason Card */
+.ai-reason {
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+    border: 1px solid #e0e7ff;
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1.5rem;
+}
+
+.reason-header {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.reason-icon {
+    font-size: 1rem;
+}
+
+.reason-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #444;
+    margin: 0;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background: #1a1a2e;
+    color: #fff;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: #0f3460;
+    transform: translateY(-2px);
+    color: #fff;
+}
+
+/* ============================================================
+   Candidates Grid
+   ============================================================ */
+.other-candidates-section {
+    margin-bottom: 4rem;
+}
+
+.candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.candidate-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.candidate-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.candidate-rank {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    z-index: 2;
+}
+
+.candidate-image {
+    position: relative;
+    padding-bottom: 100%;
+    background: var(--light-gray);
+    overflow: hidden;
+}
+
+.candidate-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.candidate-card:hover .candidate-image img {
+    transform: scale(1.05);
+}
+
+.candidate-info {
+    padding: 1rem 1.2rem 1.2rem;
+}
+
+.candidate-category {
+    font-size: 0.7rem;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.3rem;
+}
+
+.candidate-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 0.4rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.candidate-price {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 900px) {
+    .top-pick-card {
+        grid-template-columns: 1fr;
+    }
+
+    .top-pick-info {
+        padding: 1.5rem;
+    }
+
+    .candidates-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .ai-hero h1 {
+        font-size: 2rem;
+    }
+
+    .candidates-grid {
+        grid-template-columns: 1fr;
+    }
+}

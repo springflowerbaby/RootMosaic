@@ -1,0 +1,201 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}{% if query %}Search: {{ query }}{% else %}Browse Products{% endif %} - ShopWeb{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="search-container container">
+    
+    <!-- Search Header -->
+    <div class="search-header">
+        <form class="search-form" action="{{ url_for('buyer.search') }}" method="GET">
+            <div class="search-input-wrapper">
+                <input type="text" name="q" class="search-input" 
+                       value="{{ query }}" placeholder="Search products by name...">
+                <button type="submit" class="search-btn">Search</button>
+            </div>
+            <!-- Preserve filters on search -->
+            {% if category %}
+            <input type="hidden" name="category" value="{{ category }}">
+            {% endif %}
+            {% if sort_by != 'relevance' %}
+            <input type="hidden" name="sort_by" value="{{ sort_by }}">
+            {% endif %}
+        </form>
+        
+        {% if query or category %}
+        <div class="search-meta">
+            <span class="result-count">{{ total_results }} results found</span>
+            {% if query %}
+            <span class="search-term">for "<strong>{{ query }}</strong>"</span>
+            {% endif %}
+            {% if category %}
+            <span class="filter-tag">
+                in {{ category }}
+                <a href="{{ url_for('buyer.search', q=query, sort_by=sort_by) }}" class="remove-filter">×</a>
+            </span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="search-content">
+        
+        <!-- Sidebar Filters -->
+        <aside class="search-sidebar">
+            <div class="filter-section">
+                <h3 class="filter-title">Price Range</h3>
+                <form class="price-filter-form" action="{{ url_for('buyer.search') }}" method="GET">
+                    <input type="hidden" name="q" value="{{ query }}">
+                    {% if category %}
+                    <input type="hidden" name="category" value="{{ category }}">
+                    {% endif %}
+                    <input type="hidden" name="sort_by" value="{{ sort_by }}">
+                    <div class="price-inputs">
+                        <input type="number" name="min_price" class="price-input" 
+                               placeholder="Min" value="{{ min_price if min_price is not none else '' }}" step="0.01" min="0">
+                        <span class="price-separator">—</span>
+                        <input type="number" name="max_price" class="price-input" 
+                               placeholder="Max" value="{{ max_price if max_price is not none else '' }}" step="0.01" min="0">
+                    </div>
+                    <button type="submit" class="btn-apply-price">Apply</button>
+                    {% if min_price is not none or max_price is not none %}
+                    <a href="{{ url_for('buyer.search', q=query, category=category, sort_by=sort_by) }}" 
+                       class="btn-clear-price">Clear</a>
+                    {% endif %}
+                </form>
+                
+                <div class="price-presets">
+                    <a href="{{ url_for('buyer.search', q=query, category=category, sort_by=sort_by, max_price=25) }}" 
+                       class="price-preset {% if max_price == 25 and min_price is none %}active{% endif %}">Under $25</a>
+                    <a href="{{ url_for('buyer.search', q=query, category=category, sort_by=sort_by, min_price=25, max_price=50) }}" 
+                       class="price-preset {% if min_price == 25 and max_price == 50 %}active{% endif %}">$25 - $50</a>
+                    <a href="{{ url_for('buyer.search', q=query, category=category, sort_by=sort_by, min_price=50, max_price=100) }}" 
+                       class="price-preset {% if min_price == 50 and max_price == 100 %}active{% endif %}">$50 - $100</a>
+                    <a href="{{ url_for('buyer.search', q=query, category=category, sort_by=sort_by, min_price=100) }}" 
+                       class="price-preset {% if min_price == 100 and max_price is none %}active{% endif %}">$100+</a>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <h3 class="filter-title">Categories</h3>
+                <ul class="category-list">
+                    <li>
+                        <a href="{{ url_for('buyer.search', q=query, sort_by=sort_by, min_price=min_price, max_price=max_price) }}" 
+                           class="category-item {% if not category %}active{% endif %}">
+                            All Categories
+                        </a>
+                    </li>
+                    {% for cat_name, cat_count in categories %}
+                    <li>
+                        <a href="{{ url_for('buyer.search', q=query, category=cat_name, sort_by=sort_by, min_price=min_price, max_price=max_price) }}" 
+                           class="category-item {% if category == cat_name %}active{% endif %}">
+                            {{ cat_name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </aside>
+        
+        <!-- Main Results -->
+        <div class="search-results">
+            
+            <!-- Sort Bar -->
+            <div class="sort-bar">
+                <span class="sort-label">Sort by:</span>
+                <div class="sort-options">
+                    <a href="{{ url_for('buyer.search', q=query, category=category, sort_by='relevance', min_price=min_price, max_price=max_price) }}" 
+                       class="sort-option {% if sort_by == 'relevance' %}active{% endif %}">Relevance</a>
+                    <a href="{{ url_for('buyer.search', q=query, category=category, sort_by='price_asc', min_price=min_price, max_price=max_price) }}" 
+                       class="sort-option {% if sort_by == 'price_asc' %}active{% endif %}">Price ↑</a>
+                    <a href="{{ url_for('buyer.search', q=query, category=category, sort_by='price_desc', min_price=min_price, max_price=max_price) }}" 
+                       class="sort-option {% if sort_by == 'price_desc' %}active{% endif %}">Price ↓</a>
+                    <a href="{{ url_for('buyer.search', q=query, category=category, sort_by='rating_desc', min_price=min_price, max_price=max_price) }}" 
+                       class="sort-option {% if sort_by == 'rating_desc' %}active{% endif %}">Rating</a>
+                    <a href="{{ url_for('buyer.search', q=query, category=category, sort_by='newest', min_price=min_price, max_price=max_price) }}" 
+                       class="sort-option {% if sort_by == 'newest' %}active{% endif %}">Newest</a>
+                </div>
+            </div>
+            
+            {% if products %}
+            <!-- Products Grid -->
+            <div class="products-grid">
+                {% for product in products %}
+                <a href="{{ url_for('buyer.product_detail', product_id=product.id) }}" class="product-card">
+                    <div class="product-image">
+                        <img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">{{ product.name[:60] }}{% if product.name|length > 60 %}...{% endif %}</h3>
+                        <p class="product-category">{{ product.category }}</p>
+                        {% if product.brand %}
+                        <p class="product-brand">{{ product.brand }}</p>
+                        {% endif %}
+                        <div class="product-bottom">
+                            <span class="product-price">${{ "%.2f"|format(product.price) }}</span>
+                            {% if product.rating > 0 %}
+                            <span class="product-rating">Rating {{ "%.1f"|format(product.rating) }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+            <div class="pagination">
+                {% if page > 1 %}
+                <a href="{{ url_for('buyer.search', q=query, category=category, sort_by=sort_by, min_price=min_price, max_price=max_price, page=page-1) }}" 
+                   class="page-btn">← Prev</a>
+                {% endif %}
+                
+                {% set start_page = [1, page - 2]|max %}
+                {% set end_page = [total_pages, page + 2]|min %}
+                
+                {% if start_page > 1 %}
+                <a href="{{ url_for('buyer.search', q=query, category=category, sort_by=sort_by, min_price=min_price, max_price=max_price, page=1) }}" 
+                   class="page-btn">1</a>
+                {% if start_page > 2 %}<span class="page-dots">...</span>{% endif %}
+                {% endif %}
+                
+                {% for p in range(start_page, end_page + 1) %}
+                <a href="{{ url_for('buyer.search', q=query, category=category, sort_by=sort_by, min_price=min_price, max_price=max_price, page=p) }}" 
+                   class="page-btn {% if p == page %}active{% endif %}">{{ p }}</a>
+                {% endfor %}
+                
+                {% if end_page < total_pages %}
+                {% if end_page < total_pages - 1 %}<span class="page-dots">...</span>{% endif %}
+                <a href="{{ url_for('buyer.search', q=query, category=category, sort_by=sort_by, min_price=min_price, max_price=max_price, page=total_pages) }}" 
+                   class="page-btn">{{ total_pages }}</a>
+                {% endif %}
+                
+                {% if page < total_pages %}
+                <a href="{{ url_for('buyer.search', q=query, category=category, sort_by=sort_by, min_price=min_price, max_price=max_price, page=page+1) }}" 
+                   class="page-btn">Next →</a>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            {% else %}
+            <!-- No Results -->
+            <div class="no-results">
+                <div class="no-results-icon">No Results</div>
+                <h2>No products found</h2>
+                {% if query %}
+                <p>No results for "<strong>{{ query }}</strong>". Try different keywords or remove filters.</p>
+                {% else %}
+                <p>No products match the current filters. Try adjusting your criteria.</p>
+                {% endif %}
+                <a href="{{ url_for('buyer.search') }}" class="btn btn-primary">Browse All Products</a>
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

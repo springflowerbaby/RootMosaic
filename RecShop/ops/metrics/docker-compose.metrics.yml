@@ -1,0 +1,33 @@
+name: recshop-m1-sampling
+services:
+  m1-otel-metrics:
+    image: otel/opentelemetry-collector-contrib:0.128.0
+    pull_policy: never
+    container_name: recshop-m1-otel-metrics
+    command: ['--config=/etc/m1/otel-metrics-config.yaml']
+    volumes:
+      - ./otel-metrics-config.yaml:/etc/m1/otel-metrics-config.yaml:ro
+    ports:
+      - '127.0.0.1:${M1_OTLP_METRICS_GRPC_PORT:?select a verified free port}:4317'
+      - '127.0.0.1:${M1_OTEL_PROMETHEUS_PORT:?select a verified free port}:8889'
+    networks: [existing-observability]
+    restart: unless-stopped
+  m1-prometheus:
+    image: prom/prometheus:v3.5.0
+    pull_policy: never
+    container_name: recshop-m1-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - m1-prometheus-data:/prometheus
+    ports:
+      - '127.0.0.1:${M1_PROMETHEUS_PORT:?select a verified free port}:9090'
+    networks: [existing-observability]
+    depends_on: [m1-otel-metrics]
+    restart: unless-stopped
+networks:
+  existing-observability:
+    external: true
+    name: ops_default
+volumes:
+  m1-prometheus-data:
+    name: ${M1_PROMETHEUS_VOLUME:?choose a NEW collection volume name}

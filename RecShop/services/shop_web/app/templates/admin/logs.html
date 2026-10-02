@@ -1,0 +1,41 @@
+{% extends "admin/base.html" %}
+{% block title %}Activity Logs{% endblock %}
+{% block header_title %}Activity Logs{% endblock %}
+{% block content %}
+<h1 class="page-title">Admin Activity Logs</h1>
+<form class="filters" method="GET">
+    <input name="action" value="{{ action }}" placeholder="Search by action">
+    <select name="target_type">
+        <option value="">All Targets</option>
+        {% for t in ['user','merchant','item','order','admin','announcement'] %}
+        <option value="{{ t }}" {% if target_type == t %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+    </select>
+    <button class="btn">Filter</button>
+</form>
+<div class="card table-wrap">
+    <table>
+        <thead><tr><th>Time</th><th>Admin ID</th><th>Action</th><th>Target</th><th>Target ID</th><th>Detail</th><th>IP</th></tr></thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') if log.created_at else '-' }}</td>
+                <td>{{ log.admin_id }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.target_type or '-' }}</td>
+                <td>{{ log.target_id or '-' }}</td>
+                <td style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ log.detail or '-' }}</td>
+                <td>{{ log.ip_address or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if total_pages > 1 %}
+<div class="pagination">
+{% for p in range(1,total_pages+1) %}
+<a class="{% if p==page %}active{% endif %}" href="{{ url_for('admin.logs', action=action, target_type=target_type, page=p) }}">{{ p }}</a>
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

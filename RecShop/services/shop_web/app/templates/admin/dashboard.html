@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block header_title %}Dashboard{% endblock %}
+
+{% block content %}
+{% from '_macros.html' import stat_card, quick_action_button, welcome_card %}
+
+<h1 class="page-title">Platform Overview</h1>
+
+{{ welcome_card('Welcome back.', 'Wishing you a calm and productive day keeping the platform healthy.') }}
+
+<div class="stats-grid">
+  {{ stat_card('Users', total_users, accent='blue') }}
+  {{ stat_card('Merchants', total_merchants, accent='purple') }}
+  {{ stat_card('Orders', total_orders, accent='orange') }}
+  {{ stat_card('Total GMV', '$%.2f'|format(total_gmv), accent='green') }}
+  {{ stat_card('Reviews', total_reviews, accent='slate') }}
+</div>
+
+<div class="card">
+  <h3 style="margin-bottom: 10px;">Quick Actions</h3>
+  <div style="display: flex; gap: .8rem; flex-wrap: wrap;">
+    {{ quick_action_button(url_for('admin.merchants', status='pending'), 'Pending Merchants', variant='warning', badge=pending_merchants) }}
+    {{ quick_action_button(url_for('admin.items', status='pending'), 'Pending Products', variant='warning', badge=pending_items) }}
+    {% if pending_reviews > 0 %}
+      {{ quick_action_button(url_for('admin.reviews', status='pending'), 'Pending Reviews', variant='warning', badge=pending_reviews) }}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

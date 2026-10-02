@@ -1,0 +1,24 @@
+{% extends "merchant/base.html" %}
+{% block title %}Revenue Overview{% endblock %}
+{% block header_title %}Revenue Overview{% endblock %}
+{% block content %}
+<h1 class="page-title">Revenue Overview (Demo)</h1>
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">${{ "%.2f"|format(confirmed_sales) }}</div>
+        <div class="stat-label">Completed Order Sales</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">${{ "%.2f"|format(in_transit_sales) }}</div>
+        <div class="stat-label">Pending Settlement Sales (Paid/Shipped)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ "%.1f"|format(platform_rate * 100) }}%</div>
+        <div class="stat-label">Platform Fee Rate (Demo)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">${{ "%.2f"|format(estimated_settlement) }}</div>
+        <div class="stat-label">Estimated Settlement Amount</div>
+    </div>
+</div>
+{% endblock %}

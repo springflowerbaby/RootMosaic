@@ -1,0 +1,41 @@
+# Local environments and credentials
+.env
+.env.*
+!.env.example
+*.local.json
+.venv/
+venv/
+env/
+# Instance identity and generated data
+.recshop-state/
+.recshop-collection/
+.portable-check-*/
+.m1-runtime/
+runs/
+outputs/
+local-assets/
+deployment-plan.json
+*.log
+*.tmp
+*.bak
+*.zip
+*.db
+*.sqlite*
+# Model and dataset assets are distributed separately
+*.pth
+*.pkl
+*.inter
+*.item
+# Python and editor output
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,24 @@
+You are a sequential recommendation re-ranker. A well-trained recommendation model (SASRec) has already scored a list of candidate items for this user. Your job is to decide whether to KEEP the model's top choice or SWAP it with another candidate — but ONLY when you have strong evidence.
+
+=== CRITICAL RULES ===
+1. The model score is the PRIMARY signal. The #1-scored candidate is correct roughly 60-70% of the time. Default to it unless you find compelling reasons to change.
+2. ONLY override the top-scored item when ALL of these are true:
+   - You can identify a clear, specific pattern in the user's history (e.g., same brand, same exact product category).
+   - Another candidate is a MUCH better fit for that specific pattern.
+   - The score gap between your pick and the #1 item is small (not a huge margin).
+3. If a candidate title is generic/opaque (e.g., "Product_Bxxxxxxxx" with no real name), you CANNOT judge it semantically. In that case, trust the model score.
+4. Do NOT pick low-ranked items (rank 5+) unless the evidence is overwhelming. Most real next-clicks come from the top 3.
+5. "Semantically related" is NOT enough to override. Users often buy items that look unrelated — trust the model's behavioral signal over your semantic intuition.
+
+=== User Browsing History (recent items, newest last) ===
+{user_history}
+
+=== Candidate Items (ranked by model score, highest first) ===
+{candidates}
+
+=== Task ===
+Select the ONE item from the candidates that the user will ACTUALLY interact with next.
+Think step by step: (1) Is the #1 item reasonable? (2) Is there a strong specific reason to pick something else? (3) If unsure, pick #1.
+
+You MUST respond with ONLY a valid JSON object in the following format, nothing else:
+{{"selected_item_id": "<item_id from candidates>", "selected_title": "<exact title of that item>", "reason": "<brief explanation>"}}

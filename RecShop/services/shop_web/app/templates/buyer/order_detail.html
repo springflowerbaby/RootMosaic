@@ -1,0 +1,354 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}Order {{ order.order_no }} - ShopWeb{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/order.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="order-container container">
+    <h1 class="page-title">Order Details</h1>
+    
+    <div class="order-detail-content">
+        
+        <!-- Status Timeline -->
+        <div class="detail-card">
+            <div class="detail-card-title">Order Status</div>
+            {% set status_order = {'pending': 0, 'paid': 1, 'shipped': 2, 'completed': 3} %}
+            {% set current_idx = status_order.get(order.status, -1) %}
+            {% set steps = [
+                ('pending', 'Order Placed', order.created_at),
+                ('paid', 'Paid', order.paid_at),
+                ('shipped', 'Shipped', order.shipped_at),
+                ('completed', 'Completed', order.completed_at)
+            ] %}
+            
+            {% if order.status == 'cancelled' %}
+            <div style="text-align:center; padding:1.5rem;">
+                <span class="order-status-badge status-cancelled" style="font-size:1rem; padding:8px 20px;">
+                    Order Cancelled
+                </span>
+                {% if order.cancel_reason %}
+                <p style="color:#999; margin-top:0.75rem;">Reason: {{ order.cancel_reason }}</p>
+                {% endif %}
+                {% if order.cancelled_at %}
+                <p style="color:#999; font-size:0.85rem; margin-top:0.25rem;">
+                    {{ order.cancelled_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                </p>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="status-timeline">
+                {% for s_key, s_label, s_time in steps %}
+                {% set step_idx = status_order[s_key] %}
+                {% set is_done = current_idx > step_idx %}
+                {% set is_active = current_idx == step_idx %}
+                <div class="timeline-step {% if is_done %}done{% elif is_active %}active{% endif %}">
+                    <div class="timeline-dot">{{ loop.index }}</div>
+                    <div class="timeline-label">{{ s_label }}</div>
+                    {% if s_time %}
+                    <div class="timeline-time">{{ s_time.strftime('%m-%d %H:%M') }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Order Info -->
+        <div class="detail-card">
+            <div class="detail-card-title">Order Information</div>
+            <div class="detail-info-grid">
+                <div class="detail-info-item">
+                    <span class="label">Order No:</span>
+                    <span class="value">{{ order.order_no }}</span>
+                </div>
+                <div class="detail-info-item">
+                    <span class="label">Order Time:</span>
+                    <span class="value">{{ order.created_at.strftime('%Y-%m-%d %H:%M:%S') if order.created_at else '-' }}</span>
+                </div>
+                <div class="detail-info-item">
+                    <span class="label">Status:</span>
+                    <span class="value">
+                        <span class="order-status-badge status-{{ order.status }}">
+                            {{ {'pending': 'Pending Payment', 'paid': 'Paid', 'shipped': 'Shipped', 'completed': 'Completed', 'cancelled': 'Cancelled'}[order.status] }}
+                        </span>
+                    </span>
+                </div>
+                {% if order.remark %}
+                <div class="detail-info-item">
+                    <span class="label">Remark:</span>
+                    <span class="value">{{ order.remark }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Shipping Info -->
+        <div class="detail-card">
+            <div class="detail-card-title">Shipping Information</div>
+            <div class="detail-info-grid">
+                <div class="detail-info-item">
+                    <span class="label">Receiver:</span>
+                    <span class="value">{{ order.snapshot_receiver_name }}</span>
+                </div>
+                <div class="detail-info-item">
+                    <span class="label">Phone:</span>
+                    <span class="value">{{ order.snapshot_receiver_phone }}</span>
+                </div>
+                <div class="detail-info-item" style="grid-column: 1 / -1;">
+                    <span class="label">Address:</span>
+                    <span class="value">{{ order.snapshot_address }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Items -->
+        <div class="detail-card">
+            <div class="detail-card-title">Items</div>
+            <table class="detail-items-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Unit Price</th>
+                        <th>Quantity</th>
+                        <th style="text-align:right;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for oi in order.items %}
+                    <tr data-oi-id="{{ oi.id }}">
+                        <td>
+                            <div class="detail-item-info">
+                                <div class="detail-item-img">
+                                    <img src="{{ oi.item_image or 'https://placehold.co/50x50/f5f5f5/333?text=No+Image' }}" alt="{{ oi.item_title }}">
+                                </div>
+                                <div class="detail-item-name">
+                                    {{ oi.item_title }}
+                                    <!-- 渐进增强:由 /api/order/<no>?enrich=1 填充现价/库存小标签 -->
+                                    <span class="detail-item-live" data-oi-id="{{ oi.id }}" style="display:none; margin-left:8px; font-size:0.75rem; color:#888;"></span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${{ "%.2f"|format(oi.item_price) }}</td>
+                        <td>{{ oi.quantity }}</td>
+                        <td style="text-align:right; font-weight:600;">
+                            ${{ "%.2f"|format(oi.subtotal) }}
+                            {% if order.status == 'completed' %}
+                            <br>
+                            {% if oi.id in reviewed_item_ids %}
+                            <span style="color:#48bb78; font-size:0.8rem; font-weight:normal;">✓ Reviewed</span>
+                            {% else %}
+                            <button class="btn btn-order-detail" style="font-size:0.75rem; padding:3px 10px; margin-top:4px;"
+                                    onclick="openReviewModal({{ oi.id }}, '{{ oi.item_title|e }}')">Write Review</button>
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div class="detail-total-section">
+                <div class="summary-row">
+                    <span>Items ({{ order.item_count }})</span>
+                    <span>${{ "%.2f"|format(order.total_amount) }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>Free</span>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="detail-total-amount">Total: ${{ "%.2f"|format(order.total_amount) }}</div>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="detail-actions">
+            <a href="{{ url_for('buyer.orders') }}" class="btn btn-order-detail">Back to Orders</a>
+            {% if order.status == 'pending' %}
+            <button class="btn btn-order-pay" onclick="payOrder('{{ order.order_no }}')">Pay Now</button>
+            <button class="btn btn-order-cancel" onclick="cancelOrder('{{ order.order_no }}')">Cancel Order</button>
+            {% endif %}
+            {% if order.status == 'shipped' %}
+            <button class="btn btn-order-pay" onclick="completeOrder('{{ order.order_no }}')">Confirm Receipt</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+async function payOrder(orderNo) {
+    if (!confirm('Confirm payment for this order?')) return;
+    try {
+        const resp = await fetch(`/api/order/${orderNo}/pay`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        const data = await resp.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Payment failed');
+        }
+    } catch (e) {
+        alert('Network error');
+    }
+}
+
+async function cancelOrder(orderNo) {
+    const reason = prompt('Reason for cancellation (optional):');
+    if (reason === null) return;
+    try {
+        const resp = await fetch(`/api/order/${orderNo}/cancel`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({cancel_reason: reason})
+        });
+        const data = await resp.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Cancel failed');
+        }
+    } catch (e) {
+        alert('Network error');
+    }
+}
+
+async function completeOrder(orderNo) {
+    if (!confirm('Confirm you have received the items?')) return;
+    try {
+        const resp = await fetch(`/api/order/${orderNo}/complete`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        const data = await resp.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Failed');
+        }
+    } catch (e) {
+        alert('Network error');
+    }
+}
+
+/* ---- Review Modal ---- */
+let currentOrderItemId = null;
+
+function openReviewModal(orderItemId, itemTitle) {
+    currentOrderItemId = orderItemId;
+    document.getElementById('reviewItemTitle').textContent = itemTitle;
+    document.getElementById('reviewRating').value = '5';
+    document.getElementById('reviewContent').value = '';
+    document.getElementById('reviewAnonymous').checked = false;
+    setStars(5);
+    document.getElementById('reviewModal').style.display = 'flex';
+}
+
+function closeReviewModal() {
+    document.getElementById('reviewModal').style.display = 'none';
+    currentOrderItemId = null;
+}
+
+function setStars(n) {
+    document.getElementById('reviewRating').value = n;
+    const stars = document.querySelectorAll('.star-btn');
+    stars.forEach((s, i) => {
+        s.style.color = i < n ? '#f59e0b' : '#d1d5db';
+    });
+}
+
+async function submitReview() {
+    if (!currentOrderItemId) return;
+    const rating = parseInt(document.getElementById('reviewRating').value);
+    const content = document.getElementById('reviewContent').value.trim();
+    const isAnonymous = document.getElementById('reviewAnonymous').checked;
+
+    try {
+        const resp = await fetch('/api/review', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                order_item_id: currentOrderItemId,
+                rating: rating,
+                content: content,
+                is_anonymous: isAnonymous
+            })
+        });
+        const data = await resp.json();
+        if (data.success) {
+            closeReviewModal();
+            location.reload();
+        } else {
+            alert(data.message || 'Failed to submit review');
+        }
+    } catch (e) {
+        alert('Network error');
+    }
+}
+
+/* ---- 渐进增强:深度链 order_service -> catalog_service ----
+   命中 get_order_json(enrich=1),用返回的 current_price/current_available
+   在对应商品行渲染"现价/库存"小标签。纯增强,失败静默,不影响 Jinja 渲染。 */
+document.addEventListener('DOMContentLoaded', async function () {
+    try {
+        const resp = await fetch('/api/order/{{ order.order_no }}?enrich=1');
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const items = (data && data.order && data.order.items) || [];
+        items.forEach(function (it) {
+            if (it.current_available === undefined && it.current_price === undefined) return;
+            const span = document.querySelector('.detail-item-live[data-oi-id="' + it.id + '"]');
+            if (!span) return;
+            const parts = [];
+            if (it.current_price !== undefined && it.current_price !== null) {
+                parts.push('现价 $' + Number(it.current_price).toFixed(2));
+            }
+            parts.push(it.current_available ? '有货' : '缺货');
+            span.textContent = parts.join(' · ');
+            span.style.display = 'inline';
+        });
+    } catch (e) {
+        /* 优雅降级:增强失败不影响页面 */
+    }
+});
+</script>
+
+<!-- Review Modal -->
+<div id="reviewModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; padding:2rem; width:90%; max-width:480px; position:relative;">
+        <button onclick="closeReviewModal()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:1.5rem; cursor:pointer; color:#999;">&times;</button>
+        <h3 style="margin:0 0 0.5rem 0;">Write a Review</h3>
+        <p style="color:#666; font-size:0.9rem; margin:0 0 1rem 0;" id="reviewItemTitle"></p>
+
+        <div style="margin-bottom:1rem;">
+            <label style="display:block; font-weight:600; margin-bottom:0.4rem;">Rating</label>
+            <input type="hidden" id="reviewRating" value="5">
+            <div style="font-size:1.8rem; cursor:pointer;">
+                <span class="star-btn" onclick="setStars(1)" style="color:#f59e0b;">★</span>
+                <span class="star-btn" onclick="setStars(2)" style="color:#f59e0b;">★</span>
+                <span class="star-btn" onclick="setStars(3)" style="color:#f59e0b;">★</span>
+                <span class="star-btn" onclick="setStars(4)" style="color:#f59e0b;">★</span>
+                <span class="star-btn" onclick="setStars(5)" style="color:#f59e0b;">★</span>
+            </div>
+        </div>
+
+        <div style="margin-bottom:1rem;">
+            <label style="display:block; font-weight:600; margin-bottom:0.4rem;">Your Review</label>
+            <textarea id="reviewContent" rows="4" style="width:100%; border:1px solid #ddd; border-radius:8px; padding:0.6rem; font-size:0.95rem; resize:vertical;" placeholder="Share your thoughts about this product..."></textarea>
+        </div>
+
+        <div style="margin-bottom:1.2rem;">
+            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                <input type="checkbox" id="reviewAnonymous">
+                <span style="font-size:0.9rem;">Post anonymously</span>
+            </label>
+        </div>
+
+        <button onclick="submitReview()" class="btn btn-order-pay" style="width:100%;">Submit Review</button>
+    </div>
+</div>
+{% endblock %}

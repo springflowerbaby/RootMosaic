@@ -1,0 +1,115 @@
+# Source template: configure namespace, images, database, assets and observability before use.
+# The portable business deployment entry renders the 25 application templates.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sasrec
+  namespace: recshop-example
+  labels:
+    app: sasrec
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: sasrec
+  template:
+    metadata:
+      labels:
+        app: sasrec
+    spec:
+      enableServiceLinks: false
+      containers:
+      - name: sasrec
+        image: recweb-sasrec:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8200
+        env:
+        - name: NACOS_ENABLED
+          value: 'false'
+        - name: OTEL_ENABLED
+          value: 'true'
+        - name: OTEL_SERVICE_NAME
+          value: sasrec_api
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://host.docker.internal:4317
+        - name: OTEL_EXPORTER_OTLP_PROTOCOL
+          value: grpc
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: k8s.pod.name=$(POD_NAME),k8s.namespace.name=$(POD_NAMESPACE),k8s.node.name=$(NODE_NAME)
+        - name: SASREC_CACHE_PATH
+          value: standard_cache.pkl
+        - name: SASREC_MODEL_PATH
+          value: SASRec-Feb-24-2026_17-54-22.pth
+        volumeMounts:
+        - name: sasrec-data
+          mountPath: /app/services/sasrec_api/standard_cache.pkl
+          subPath: standard_cache.pkl
+          readOnly: true
+        - name: sasrec-data
+          mountPath: /app/services/sasrec_api/SASRec-Feb-24-2026_17-54-22.pth
+          subPath: SASRec-Feb-24-2026_17-54-22.pth
+          readOnly: true
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8200
+          periodSeconds: 10
+          failureThreshold: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8200
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8200
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 5
+        resources:
+          requests:
+            memory: 12Gi
+            cpu: 500m
+          limits:
+            cpu: '4'
+      volumes:
+      - name: sasrec-data
+        persistentVolumeClaim:
+          claimName: sasrec-data
+          readOnly: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sasrec
+  namespace: recshop-example
+  labels:
+    app: sasrec
+spec:
+  type: ClusterIP
+  selector:
+    app: sasrec
+  ports:
+  - name: http
+    port: 8200
+    targetPort: 8200

@@ -1,0 +1,163 @@
+{% extends "merchant/base.html" %}
+
+{% block title %}Review Management{% endblock %}
+{% block header_title %}Review Management{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Customer Reviews</h1>
+
+<!-- Filter tabs -->
+<div class="status-tabs">
+    <a href="{{ url_for('merchant.reviews') }}" class="{% if not reply_filter %}active{% endif %}">
+        All ({{ total_count }})
+    </a>
+    <a href="{{ url_for('merchant.reviews', filter='pending') }}" class="{% if reply_filter == 'pending' %}active{% endif %}">
+        Pending Reply ({{ pending_reply }})
+    </a>
+    <a href="{{ url_for('merchant.reviews', filter='replied') }}" class="{% if reply_filter == 'replied' %}active{% endif %}">
+        Replied ({{ replied_count }})
+    </a>
+</div>
+
+<!-- Reviews list -->
+<div class="card" style="padding: 0; overflow-x: auto;">
+    {% if reviews %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Rating</th>
+                <th>Content</th>
+                <th>Reviewer</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for review in reviews %}
+            <tr>
+                <td style="max-width:180px;">
+                    <div style="font-size:.85rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        {{ review.item.title if review.item else review.item_id }}
+                    </div>
+                </td>
+                <td>
+                    <span style="color:#f59e0b;">{{ '★' * review.rating }}{{ '☆' * (5 - review.rating) }}</span>
+                </td>
+                <td style="max-width:250px;">
+                    <div style="font-size:.85rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{ review.content }}">
+                        {{ review.content or '-' }}
+                    </div>
+                </td>
+                <td style="font-size:.85rem;">
+                    {% if review.is_anonymous %}Anonymous{% else %}{{ review.user.username if review.user else 'User' }}{% endif %}
+                </td>
+                <td style="font-size:.85rem; color:#95a5a6;">
+                    {{ review.created_at.strftime('%Y-%m-%d %H:%M') if review.created_at else '-' }}
+                </td>
+                <td>
+                    {% if review.reply %}
+                    <span class="badge badge-active">Replied</span>
+                    {% else %}
+                    <span class="badge badge-pending">Pending Reply</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if review.reply %}
+                    <button class="btn btn-outline btn-sm" onclick="viewReply({{ review.id }})">View Reply</button>
+                    {% else %}
+                    <button class="btn btn-primary btn-sm" onclick="openReplyModal({{ review.id }})">Reply</button>
+                    {% endif %}
+                </td>
+            </tr>
+            <!-- Reply row (hidden by default) -->
+            {% if review.reply %}
+            <tr id="reply-row-{{ review.id }}" style="display:none;">
+                <td colspan="7" style="background:#f8fafc; padding:0.8rem 1.2rem;">
+                    <div style="font-size:.85rem;">
+                        <strong>Your Reply:</strong> {{ review.reply.content }}
+                        <span style="color:#aaa; margin-left:0.5rem;">{{ review.reply.created_at.strftime('%Y-%m-%d') if review.reply.created_at else '' }}</span>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align:center; padding:3rem; color:#95a5a6;">
+        <p style="font-size:1rem; font-weight:600;">Reviews</p>
+        <p>No reviews yet</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Pagination -->
+{% if total_pages > 1 %}
+<div class="pagination">
+    {% if page > 1 %}
+    <a href="{{ url_for('merchant.reviews', filter=reply_filter, page=page-1) }}">Previous</a>
+    {% endif %}
+    {% for p in range(1, total_pages + 1) %}
+    <a href="{{ url_for('merchant.reviews', filter=reply_filter, page=p) }}"
+       class="{% if p == page %}active{% endif %}">{{ p }}</a>
+    {% endfor %}
+    {% if page < total_pages %}
+    <a href="{{ url_for('merchant.reviews', filter=reply_filter, page=page+1) }}">Next</a>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Reply Modal -->
+<div id="replyModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; padding:2rem; width:90%; max-width:480px; position:relative;">
+        <button onclick="closeReplyModal()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:1.5rem; cursor:pointer; color:#999;">&times;</button>
+        <h3 style="margin:0 0 1rem 0;">Reply to Review</h3>
+        <textarea id="replyContent" rows="4" style="width:100%; border:1px solid #ddd; border-radius:8px; padding:0.6rem; font-size:0.95rem; resize:vertical;" placeholder="Enter your reply..."></textarea>
+        <button onclick="submitReply()" class="btn btn-primary" style="width:100%; margin-top:0.8rem;">Submit Reply</button>
+    </div>
+</div>
+
+<script>
+let currentReviewId = null;
+
+function openReplyModal(reviewId) {
+    currentReviewId = reviewId;
+    document.getElementById('replyContent').value = '';
+    document.getElementById('replyModal').style.display = 'flex';
+}
+
+function closeReplyModal() {
+    document.getElementById('replyModal').style.display = 'none';
+    currentReviewId = null;
+}
+
+async function submitReply() {
+    if (!currentReviewId) return;
+    const content = document.getElementById('replyContent').value.trim();
+    if (!content) { alert('Reply content cannot be empty'); return; }
+    try {
+        const resp = await fetch(`/merchant/api/reviews/${currentReviewId}/reply`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ content })
+        });
+        const data = await resp.json();
+        if (data.success) {
+            closeReplyModal();
+            location.reload();
+        } else {
+            alert(data.message || 'Failed');
+        }
+    } catch (e) { alert('Network error'); }
+}
+
+function viewReply(reviewId) {
+    const row = document.getElementById(`reply-row-${reviewId}`);
+    if (row) {
+        row.style.display = row.style.display === 'none' ? '' : 'none';
+    }
+}
+</script>
+{% endblock %}

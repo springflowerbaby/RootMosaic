@@ -1,0 +1,146 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}Register - ShopWeb{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<style>
+    .password-requirements {
+        font-size: 0.85rem;
+        color: var(--secondary-color);
+        margin-top: 0.5rem;
+        padding-left: 1rem;
+    }
+    
+    .password-requirements li {
+        margin-bottom: 0.25rem;
+    }
+    
+    .password-requirements li.valid {
+        color: #3c3;
+    }
+    
+    .password-requirements li.invalid {
+        color: #c33;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-box">
+        <h1>Create Account</h1>
+        <p class="login-subtitle">Sign up to get started</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" action="{{ url_for('buyer.register') }}" class="login-form" id="registerForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="your@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••">
+                <ul class="password-requirements" id="passwordRequirements">
+                    <li id="req-length">At least 8 characters</li>
+                    <li id="req-uppercase">At least one uppercase letter</li>
+                    <li id="req-lowercase">At least one lowercase letter</li>
+                    <li id="req-number">At least one number</li>
+                </ul>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" required placeholder="••••••••">
+                <span id="passwordMatch" style="font-size: 0.85rem; margin-top: 0.25rem; display: block;"></span>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+        </form>
+        
+        <div class="login-footer">
+            <p>Already have an account? <a href="{{ url_for('buyer.login') }}">Sign in</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const passwordMatch = document.getElementById('passwordMatch');
+    
+    const requirements = {
+        length: document.getElementById('req-length'),
+        uppercase: document.getElementById('req-uppercase'),
+        lowercase: document.getElementById('req-lowercase'),
+        number: document.getElementById('req-number')
+    };
+    
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        
+        if (password.length >= 8) {
+            requirements.length.classList.add('valid');
+            requirements.length.classList.remove('invalid');
+        } else {
+            requirements.length.classList.add('invalid');
+            requirements.length.classList.remove('valid');
+        }
+        
+        if (/[A-Z]/.test(password)) {
+            requirements.uppercase.classList.add('valid');
+            requirements.uppercase.classList.remove('invalid');
+        } else {
+            requirements.uppercase.classList.add('invalid');
+            requirements.uppercase.classList.remove('valid');
+        }
+        
+        if (/[a-z]/.test(password)) {
+            requirements.lowercase.classList.add('valid');
+            requirements.lowercase.classList.remove('invalid');
+        } else {
+            requirements.lowercase.classList.add('invalid');
+            requirements.lowercase.classList.remove('valid');
+        }
+        
+        if (/[0-9]/.test(password)) {
+            requirements.number.classList.add('valid');
+            requirements.number.classList.remove('invalid');
+        } else {
+            requirements.number.classList.add('invalid');
+            requirements.number.classList.remove('valid');
+        }
+        
+        checkPasswordMatch();
+    });
+    
+    confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+    
+    function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        
+        if (confirmPassword === '') {
+            passwordMatch.textContent = '';
+            passwordMatch.style.color = '';
+            return;
+        }
+        
+        if (password === confirmPassword) {
+            passwordMatch.textContent = 'Passwords match';
+            passwordMatch.style.color = '#3c3';
+        } else {
+            passwordMatch.textContent = 'Passwords do not match';
+            passwordMatch.style.color = '#c33';
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "merchant/base.html" %}
+
+{% block title %}{{ 'Edit Product' if product else 'Create New Product' }}{% endblock %}
+{% block header_title %}{{ 'Edit Product' if product else 'Create New Product' }}{% endblock %}
+
+{% block content %}
+<h1 class="page-title">{{ 'Edit Product' if product else 'Create New Product' }}</h1>
+
+<div class="card" style="max-width: 700px;">
+    <form method="POST" action="{{ url_for('merchant.product_edit', product_id=product.id) if product else url_for('merchant.product_new') }}">
+        <div class="form-group">
+            <label>Product Title <span style="color:#e74c3c">*</span></label>
+            <input type="text" name="title" value="{{ product.title if product else '' }}" required placeholder="Enter product title">
+        </div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+                <label>Category</label>
+                <input type="text" name="category" value="{{ product.category if product else '' }}" placeholder="e.g. Electronics">
+            </div>
+            <div class="form-group">
+                <label>Brand</label>
+                <input type="text" name="brand" value="{{ product.brand if product else '' }}" placeholder="e.g. Sony">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Price</label>
+            <input type="number" name="price" step="0.01" min="0" 
+                   value="{{ '%.2f'|format(product.price) if product and product.price else '' }}" placeholder="0.00">
+        </div>
+        
+        <div class="form-group">
+            <label>Product Image URL</label>
+            <input type="url" name="image_url" value="{{ (product.image_url or '') if product else '' }}" placeholder="https://...">
+        </div>
+        
+        <div class="form-group">
+            <label>Product Description</label>
+            <textarea name="description" rows="5" placeholder="Describe your product...">{{ product.description if product else '' }}</textarea>
+        </div>
+        
+        <div style="display:flex;gap:.8rem;margin-top:1.5rem;">
+            <button type="submit" class="btn btn-primary">{{ 'Save Changes' if product else 'Create Product' }}</button>
+            <a href="{{ url_for('merchant.products') }}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

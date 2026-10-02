@@ -1,0 +1,31 @@
+{% extends "merchant/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block header_title %}Dashboard{% endblock %}
+
+{% block content %}
+{% from '_macros.html' import stat_card, quick_action_button, welcome_card %}
+
+<h1 class="page-title">Overview</h1>
+
+{{ welcome_card('Welcome back.', 'Wishing you smooth operations and steady orders today.') }}
+
+<div class="stats-grid">
+  {{ stat_card('Total Products', total_products, accent='blue') }}
+  {{ stat_card('Pending Shipment Orders', pending_orders, accent='orange') }}
+  {{ stat_card('Total Sales', '$%.2f'|format(total_sales), accent='green') }}
+  {{ stat_card('Pending Reply Reviews', pending_reviews, accent='purple') }}
+</div>
+
+<div class="card">
+  <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
+  <div style="display: flex; gap: .8rem; flex-wrap: wrap;">
+    {{ quick_action_button(url_for('merchant.product_new'), 'Add Product', variant='primary') }}
+    {{ quick_action_button(url_for('merchant.orders'), 'View Orders', variant='outline', badge=pending_orders) }}
+    {{ quick_action_button(url_for('merchant.reviews'), 'View Reviews', variant='outline', badge=pending_reviews) }}
+    {% if pending_reviews > 0 %}
+      {{ quick_action_button(url_for('merchant.reviews', filter='pending'), 'Reply to Reviews', variant='warning', badge=pending_reviews) }}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

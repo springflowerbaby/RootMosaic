@@ -1,0 +1,3 @@
+# Python3.10 runtime dependencies for the CRI exporter image.
+grpcio==1.78.0
+protobuf==6.33.6

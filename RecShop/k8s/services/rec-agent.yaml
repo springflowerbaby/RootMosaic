@@ -1,0 +1,93 @@
+# Source template: configure namespace, images, database, assets and observability before use.
+# The portable business deployment entry renders the 25 application templates.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rec-agent
+  namespace: recshop-example
+  labels:
+    app: recommendation_agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recommendation_agent
+  template:
+    metadata:
+      labels:
+        app: recommendation_agent
+    spec:
+      enableServiceLinks: false
+      containers:
+      - name: rec-agent
+        image: recweb-rec-agent:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 5001
+        env:
+        - name: NACOS_ENABLED
+          value: 'false'
+        - name: SASREC_API_URL
+          value: http://sasrec:8200
+        - name: OTEL_ENABLED
+          value: 'true'
+        - name: OTEL_SERVICE_NAME
+          value: recommendation_agent
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://host.docker.internal:4317
+        - name: OTEL_EXPORTER_OTLP_PROTOCOL
+          value: grpc
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: k8s.pod.name=$(POD_NAME),k8s.namespace.name=$(POD_NAMESPACE),k8s.node.name=$(NODE_NAME)
+        readinessProbe:
+          httpGet:
+            path: /recommend/health
+            port: 5001
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /recommend/health
+            port: 5001
+          initialDelaySeconds: 15
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rec-agent
+  namespace: recshop-example
+  labels:
+    app: recommendation_agent
+spec:
+  type: ClusterIP
+  selector:
+    app: recommendation_agent
+  ports:
+  - name: http
+    port: 5001
+    targetPort: 5001

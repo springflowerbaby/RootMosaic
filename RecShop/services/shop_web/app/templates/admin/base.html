@@ -1,0 +1,275 @@
+{% extends "admin/_console_shell.html" %}
+
+{% block title %}Admin Console{% endblock %}
+{% block console_brand %}Admin Console{% endblock %}
+{% block header_title %}Admin Console{% endblock %}
+
+{% block console_nav %}
+<a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">Dashboard</a>
+<a href="{{ url_for('admin.users') }}" class="{% if request.endpoint and 'user' in request.endpoint %}active{% endif %}">Users</a>
+<a href="{{ url_for('admin.merchants') }}" class="{% if request.endpoint and 'merchant' in request.endpoint %}active{% endif %}">Merchants</a>
+<a href="{{ url_for('admin.items') }}" class="{% if request.endpoint and 'item' in request.endpoint %}active{% endif %}">Products</a>
+<a href="{{ url_for('admin.orders') }}" class="{% if request.endpoint and 'order' in request.endpoint %}active{% endif %}">Orders</a>
+<a href="{{ url_for('admin.reviews') }}" class="{% if request.endpoint == 'admin.reviews' %}active{% endif %}">Reviews</a>
+<a href="{{ url_for('admin.stats') }}" class="{% if request.endpoint == 'admin.stats' %}active{% endif %}">Analytics</a>
+<a href="{{ url_for('admin.announcements') }}" class="{% if request.endpoint and 'announcement' in request.endpoint %}active{% endif %}">Announcements</a>
+<a href="{{ url_for('admin.logs') }}" class="{% if request.endpoint == 'admin.logs' %}active{% endif %}">Logs</a>
+{% if current_user.role == 'super_admin' %}
+<a href="{{ url_for('admin.admins') }}" class="{% if request.endpoint and request.endpoint.startswith('admin.admin') %}active{% endif %}">Admin Accounts</a>
+{% endif %}
+{% endblock %}
+
+{% block console_header_user %}
+<span style="color:#94a3b8;font-size:13px;">{{ current_user.username }}</span>
+<a class="btn btn-sm" href="{{ url_for('admin.logout') }}">Logout</a>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Admin AI Assistant Chat Widget */
+    .ac-chat-widget {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        z-index: 1100;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .ac-chat-btn {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+        color: #fff;
+        border: none;
+        box-shadow: 0 4px 14px rgba(14,165,233,.4);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: 700;
+        transition: transform .25s, box-shadow .25s;
+    }
+    .ac-chat-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(14,165,233,.55); }
+
+    .ac-chat-window {
+        position: absolute;
+        bottom: 64px;
+        right: 0;
+        width: 440px;
+        height: 560px;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 8px 30px rgba(0,0,0,.18);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        animation: acSlideIn .3s ease;
+    }
+    @keyframes acSlideIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .ac-chat-window.open { display: flex; }
+
+    .ac-chat-header {
+        padding: .85rem 1rem;
+        background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .ac-chat-header .title { font-weight: 600; font-size: 1rem; }
+    .ac-chat-header .close-btn {
+        background: none; border: none; color: #fff;
+        cursor: pointer; font-size: 1.4rem; line-height: 1; padding: 0 4px;
+    }
+
+    .ac-chat-messages {
+        flex: 1;
+        padding: .85rem;
+        overflow-y: auto;
+        background: #f7f8fa;
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+    }
+    .ac-msg {
+        max-width: 82%;
+        padding: .75rem 1rem;
+        border-radius: 12px;
+        font-size: .93rem;
+        line-height: 1.6;
+        word-break: break-word;
+        white-space: pre-wrap;
+    }
+    .ac-msg.ai {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        color: #333;
+    }
+    .ac-msg.user {
+        background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+        color: #fff;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+    }
+    .ac-msg.ai.loading { color: #999; font-style: italic; }
+
+    .ac-chat-input-area {
+        padding: .75rem;
+        border-top: 1px solid #eee;
+        background: #fff;
+        display: flex;
+        gap: .45rem;
+        align-items: center;
+    }
+    .ac-chat-input-area input {
+        flex: 1;
+        padding: .7rem .9rem;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+        font-size: .93rem;
+        transition: border-color .3s;
+    }
+    .ac-chat-input-area input:focus { border-color: #0ea5e9; }
+    .ac-chat-input-area button {
+        background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+        color: #fff; border: none;
+        width: 36px; height: 36px;
+        border-radius: 50%; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-size: .95rem;
+        transition: opacity .2s;
+    }
+    .ac-chat-input-area button:disabled { opacity: .5; cursor: not-allowed; }
+
+    .ac-suggestions {
+        display: flex; flex-wrap: wrap; gap: .4rem;
+        padding: 0 .85rem .6rem;
+        background: #f7f8fa;
+    }
+    .ac-suggestions button {
+        background: #fff; border: 1px solid #d1d5db; border-radius: 16px;
+        padding: .3rem .7rem; font-size: .8rem; color: #555;
+        cursor: pointer; transition: all .2s;
+    }
+    .ac-suggestions button:hover { border-color: #0ea5e9; color: #0ea5e9; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Admin AI Assistant Chat Widget -->
+<div class="ac-chat-widget">
+    <button class="ac-chat-btn" id="acChatBtn" title="AI Operations Assistant">AI</button>
+    <div class="ac-chat-window" id="acChatWindow">
+        <div class="ac-chat-header">
+            <span class="title">AI Operations Assistant</span>
+            <button class="close-btn" id="acCloseChat">&times;</button>
+        </div>
+        <div class="ac-chat-messages" id="acChatMessages">
+            <div class="ac-msg ai">Hello! I'm your AI operations assistant. I can analyze platform data including user growth, merchant status, order trends, review moderation, and admin activity logs. How can I help you today?</div>
+        </div>
+        <div class="ac-suggestions" id="acSuggestions">
+            <button data-q="Give me a platform health summary">Platform overview</button>
+            <button data-q="What items need my attention right now? Any pending approvals?">Pending actions</button>
+            <button data-q="Analyze recent admin activity logs for anything unusual">Log analysis</button>
+            <button data-q="How are order trends looking this week vs last month?">Order trends</button>
+        </div>
+        <div class="ac-chat-input-area">
+            <input type="text" id="acChatInput" placeholder="Ask about platform operations...">
+            <button id="acSendBtn">&#x27A4;</button>
+        </div>
+    </div>
+</div>
+<script>
+(function() {
+    const btn       = document.getElementById('acChatBtn');
+    const win       = document.getElementById('acChatWindow');
+    const closeBtn  = document.getElementById('acCloseChat');
+    const input     = document.getElementById('acChatInput');
+    const sendBtn   = document.getElementById('acSendBtn');
+    const msgBox    = document.getElementById('acChatMessages');
+    const sugBox    = document.getElementById('acSuggestions');
+
+    let history = [];
+
+    function toggle() { win.classList.toggle('open'); if (win.classList.contains('open')) input.focus(); }
+    btn.addEventListener('click', toggle);
+    closeBtn.addEventListener('click', toggle);
+
+    function addMsg(text, type) {
+        const div = document.createElement('div');
+        div.className = 'ac-msg ' + type;
+        div.textContent = text;
+        msgBox.appendChild(div);
+        msgBox.scrollTop = msgBox.scrollHeight;
+        return div;
+    }
+
+    function setLoading(on) {
+        if (on) {
+            const el = addMsg('Thinking...', 'ai loading');
+            el.id = 'ac-loading';
+        } else {
+            const el = document.getElementById('ac-loading');
+            if (el) el.remove();
+        }
+    }
+
+    async function send(text) {
+        if (!text.trim()) return;
+        addMsg(text, 'user');
+        input.value = '';
+        input.disabled = true;
+        sendBtn.disabled = true;
+
+        if (sugBox) sugBox.style.display = 'none';
+
+        history.push({ role: 'user', content: text });
+        setLoading(true);
+
+        try {
+            const resp = await fetch('{{ url_for("admin.admin_chat") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: history })
+            });
+            const data = await resp.json();
+            setLoading(false);
+
+            if (data.success) {
+                addMsg(data.message, 'ai');
+                history.push({ role: 'assistant', content: data.message });
+            } else {
+                addMsg('Sorry, ' + (data.message || data.error || 'service temporarily unavailable'), 'ai');
+            }
+        } catch (e) {
+            setLoading(false);
+            addMsg('Network error, please try again.', 'ai');
+            console.error('AdminChat error:', e);
+        } finally {
+            input.disabled = false;
+            sendBtn.disabled = false;
+            input.focus();
+        }
+    }
+
+    sendBtn.addEventListener('click', function() { send(input.value); });
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input.value); }
+    });
+
+    sugBox.querySelectorAll('button[data-q]').forEach(function(b) {
+        b.addEventListener('click', function() { send(b.dataset.q); });
+    });
+})();
+</script>
+{% endblock %}

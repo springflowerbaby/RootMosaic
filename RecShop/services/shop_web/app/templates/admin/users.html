@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+{% block title %}User Management{% endblock %}
+{% block header_title %}User Management{% endblock %}
+{% block content %}
+<h1 class="page-title">User List</h1>
+<form class="filters" method="get">
+    <input name="q" placeholder="Search user_token / username / email" value="{{ q }}">
+    <button class="btn">Search</button>
+</form>
+<div class="card table-wrap">
+<table>
+    <thead><tr><th>User Token</th><th>Username</th><th>Email</th><th>Status</th><th>Created At</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for user in users %}
+    <tr>
+        <td>{{ user.user_token }}</td>
+        <td>{{ user.username or '-' }}</td>
+        <td>{{ user.email or '-' }}</td>
+        <td><span class="badge b-{{ user.status }}">{{ user.status }}</span></td>
+        <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else '-' }}</td>
+        <td>
+            <a class="btn btn-sm" href="{{ url_for('admin.user_detail', user_token=user.user_token) }}">Details</a>
+            {% if user.status == 'banned' %}
+            <button class="btn btn-sm" onclick="toggleBan('{{ user.user_token }}')">Unban</button>
+            {% else %}
+            <button class="btn btn-sm btn-danger" onclick="toggleBan('{{ user.user_token }}')">Ban</button>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% if total_pages > 1 %}
+<div class="pagination">
+    {% for p in range(1, total_pages + 1) %}
+    <a class="{% if p == page %}active{% endif %}" href="{{ url_for('admin.users', q=q, page=p) }}">{{ p }}</a>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script>
+async function toggleBan(userToken) {
+    const resp = await fetch(`/admin/api/users/${userToken}/toggle-ban`, {method: 'POST'});
+    const data = await resp.json();
+    if (data.success) location.reload(); else alert(data.message || 'Operation failed');
+}
+</script>
+{% endblock %}

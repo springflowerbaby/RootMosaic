@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ShopWeb{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    {% block styles %}{% endblock %}
+    <style>
+        .nav-search-form {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            max-width: 400px;
+            margin: 0 1.5rem;
+        }
+        .nav-search-input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px 0 0 8px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .nav-search-input:focus {
+            border-color: var(--primary-color);
+        }
+        .nav-search-btn {
+            padding: 0.5rem 0.9rem;
+            background: var(--primary-color);
+            color: white;
+            border: 1px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .nav-search-btn:hover {
+            background: #333;
+            border-color: #333;
+        }
+        .announcement-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            z-index: 2000;
+        }
+        .announcement-modal {
+            width: min(560px, 100%);
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .announcement-modal h3 {
+            margin: 0 0 0.75rem;
+            font-size: 1.5rem;
+        }
+        .announcement-modal p {
+            margin: 0 0 1rem;
+            color: #475569;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        .announcement-modal img {
+            max-width: 100%;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        .announcement-modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .announcement-link-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.25rem;
+            border-radius: 999px;
+            background: var(--primary-color);
+            color: #fff;
+            text-decoration: none;
+        }
+        .announcement-close-btn {
+            padding: 0.75rem 1.25rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 999px;
+            background: #fff;
+            color: #334155;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .nav-search-form {
+                max-width: 200px;
+                margin: 0 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container nav-container">
+            <a href="{{ url_for('buyer.index') }}" class="logo">ShopWeb</a>
+            <form class="nav-search-form" action="{{ url_for('buyer.search') }}" method="GET">
+                <input type="text" name="q" class="nav-search-input" placeholder="Search products...">
+                <button type="submit" class="nav-search-btn">Search</button>
+            </form>
+            <div class="nav-links">
+                <a href="{{ url_for('buyer.index') }}">Home</a>
+                {% if is_buyer_user %}
+                <a href="{{ url_for('buyer.ai_picks') }}" class="nav-ai-picks">AI Picks</a>
+                <a href="{{ url_for('buyer.cart') }}">Cart</a>
+                <a href="{{ url_for('buyer.orders') }}">Orders</a>
+                <a href="{{ url_for('buyer.profile') }}">Profile</a>
+                {% endif %}
+                <a href="{{ url_for('buyer.about') }}">About</a>
+                {% if is_buyer_user %}
+                    <div class="user-menu">
+                        <img src="{{ current_user.get_avatar() }}" alt="{{ current_user.username }}" class="user-avatar">
+                        <span class="username">{{ current_user.username }}</span>
+                        <a href="{{ url_for('buyer.logout') }}" class="logout-btn">Logout</a>
+                    </div>
+                {% elif current_user.is_authenticated %}
+                    <a href="{{ url_for('admin.dashboard') if current_role == 'admin' else url_for('merchant.dashboard') }}">Back to Console</a>
+                    <a href="{{ url_for('buyer.logout') }}" class="logout-btn">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('buyer.login') }}">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if latest_buyer_announcement and current_role == 'buyer' and request.endpoint == 'buyer.index' %}
+    <div class="announcement-modal-backdrop" id="announcement-modal">
+        <div class="announcement-modal" role="dialog" aria-modal="true" aria-labelledby="announcement-title">
+            <h3 id="announcement-title">{{ latest_buyer_announcement.title }}</h3>
+            {% if latest_buyer_announcement.image_url %}
+            <img src="{{ latest_buyer_announcement.image_url }}" alt="{{ latest_buyer_announcement.title }}">
+            {% endif %}
+            {% if latest_buyer_announcement.content %}
+            <p>{{ latest_buyer_announcement.content }}</p>
+            {% endif %}
+            <div class="announcement-modal-actions">
+                {% if latest_buyer_announcement.link_url %}
+                <a class="announcement-link-btn" href="{{ latest_buyer_announcement.link_url }}">View details</a>
+                {% endif %}
+                <button type="button" class="announcement-close-btn" id="announcement-close-btn">Close</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if latest_buyer_announcement and current_role == 'buyer' and request.endpoint == 'buyer.index' %}
+    <script>
+        const announcementModal = document.getElementById('announcement-modal');
+        const announcementCloseBtn = document.getElementById('announcement-close-btn');
+        if (announcementModal && announcementCloseBtn) {
+            announcementCloseBtn.addEventListener('click', () => {
+                announcementModal.style.display = 'none';
+            });
+            announcementModal.addEventListener('click', (event) => {
+                if (event.target === announcementModal) {
+                    announcementModal.style.display = 'none';
+                }
+            });
+        }
+    </script>
+    {% endif %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

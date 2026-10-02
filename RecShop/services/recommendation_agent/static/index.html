@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品推荐多Agent系统</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛒 商品推荐多Agent系统</h1>
+            <p class="subtitle">基于SASRec序列推荐模型的多智能体推荐系统</p>
+        </header>
+
+        <!-- 输入区域 -->
+        <div class="input-section card">
+            <h3>📝 输入用户历史交互序列</h3>
+            <div class="input-group">
+                <label for="itemSequence">商品ID序列 (逗号分隔):</label>
+                <input type="text" id="itemSequence" 
+                       placeholder="例如: 015600206X, 6300215695, 0446673145"
+                       value="015600206X, 6300215695, 0446673145">
+            </div>
+            <div class="input-group">
+                <label for="topK">推荐数量:</label>
+                <input type="number" id="topK" value="5" min="1" max="20">
+            </div>
+            <div class="button-group">
+                <button id="checkHealth" class="btn btn-secondary">检查服务状态</button>
+                <button id="startRecommend" class="btn btn-primary">开始推荐</button>
+            </div>
+        </div>
+
+        <!-- 服务状态 -->
+        <div class="status-section card" id="statusSection" style="display: none;">
+            <h3>🔌 服务状态</h3>
+            <div id="statusContent"></div>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="progress-section card" id="progressSection" style="display: none;">
+            <h3>⏳ 推荐进度</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p class="progress-text" id="progressText">准备中...</p>
+        </div>
+
+        <!-- Agent对话区域 -->
+        <div class="chat-section card" id="chatSection" style="display: none;">
+            <h3>🤖 多Agent分析过程</h3>
+            <div class="chat-container">
+                <!-- 左侧Agent -->
+                <div class="chat-column left">
+                    <div class="chat-item" id="chat-SequenceRecommender">
+                        <div class="agent-info">
+                            <img src="/static/role1.jpg" alt="序列推荐专家" class="agent-avatar">
+                            <div class="agent-name">序列推荐专家</div>
+                        </div>
+                        <div class="speech-bubble">
+                            <div class="message" id="msg-SequenceRecommender">等待分析...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" id="chat-UserBehaviorAnalyzer">
+                        <div class="agent-info">
+                            <img src="/static/role2.jpg" alt="用户行为分析师" class="agent-avatar">
+                            <div class="agent-name">用户行为分析师</div>
+                        </div>
+                        <div class="speech-bubble">
+                            <div class="message" id="msg-UserBehaviorAnalyzer">等待分析...</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 右侧Agent -->
+                <div class="chat-column right">
+                    <div class="chat-item reverse" id="chat-ProductAnalyzer">
+                        <div class="speech-bubble">
+                            <div class="message" id="msg-ProductAnalyzer">等待分析...</div>
+                        </div>
+                        <div class="agent-info">
+                            <img src="/static/role4.jpg" alt="商品分析专家" class="agent-avatar">
+                            <div class="agent-name">商品分析专家</div>
+                        </div>
+                    </div>
+                    <div class="chat-item reverse" id="chat-RecommendationSynthesizer">
+                        <div class="speech-bubble synthesizer">
+                            <div class="message" id="msg-RecommendationSynthesizer">等待分析...</div>
+                        </div>
+                        <div class="agent-info">
+                            <img src="/static/role5.jpg" alt="推荐综合分析师" class="agent-avatar">
+                            <div class="agent-name">推荐综合分析师</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最终推荐结果 -->
+        <div class="result-section card" id="resultSection" style="display: none;">
+            <h3>🎁 最终推荐结果</h3>
+            <div class="result-content">
+                <div class="result-item">
+                    <span class="label">推荐商品ID:</span>
+                    <span class="value" id="resultProductId">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">商品名称:</span>
+                    <span class="value" id="resultProductTitle">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">推荐置信度:</span>
+                    <span class="value" id="resultConfidence">-</span>
+                </div>
+                <div class="result-item full-width">
+                    <span class="label">推荐原因:</span>
+                    <div class="value reason" id="resultReason">-</div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>商品推荐多Agent系统 v1.0 | 基于LangGraph + SASRec</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

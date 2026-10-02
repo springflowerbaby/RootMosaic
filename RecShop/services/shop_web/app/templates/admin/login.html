@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - ShopWeb</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        .login-container { width: 100%; max-width: 420px; padding: 1rem; }
+        .login-card {
+            background: #fff; border-radius: 12px; padding: 2.5rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,.15);
+        }
+        .login-brand { text-align: center; margin-bottom: 2rem; }
+        .login-brand h1 { font-size: 1.4rem; color: #1e293b; }
+        .login-brand p { font-size: .9rem; color: #64748b; margin-top: .3rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: .3rem; font-weight: 600; font-size: .9rem; color: #1e293b; }
+        .form-group input {
+            width: 100%; padding: .7rem .9rem; border: 1px solid #ddd; border-radius: 8px;
+            font-size: .95rem; outline: none; transition: border-color .2s;
+        }
+        .form-group input:focus { border-color: #4f46e5; }
+        .btn-login {
+            width: 100%; padding: .8rem; background: #4f46e5; color: #fff; border: none;
+            border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .2s;
+        }
+        .btn-login:hover { background: #4338ca; }
+        .login-footer { text-align: center; margin-top: 1.2rem; font-size: .9rem; color: #64748b; }
+        .login-footer a { color: #4f46e5; text-decoration: none; font-weight: 600; }
+        .login-footer a:hover { text-decoration: underline; }
+        .alert { padding: .6rem .8rem; border-radius: 6px; margin-bottom: 1rem; font-size: .85rem; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-warning { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-brand">
+                <div style="font-size: .9rem; color: #64748b; margin-bottom: .5rem;">Admin Platform</div>
+                <h1>Admin Console</h1>
+                <p>Sign in to the admin dashboard</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('admin.login') }}">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required placeholder="admin@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-login">Login</button>
+            </form>
+
+            <div class="login-footer">
+                <p><a href="{{ url_for('buyer.index') }}" style="color:#64748b;">← Back to Buyer Site</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

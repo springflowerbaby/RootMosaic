@@ -1,0 +1,229 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}My Orders - ShopWeb{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/order.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="order-container container">
+    <h1 class="page-title">My Orders</h1>
+    
+    <!-- Status Tabs -->
+    <div class="order-tabs">
+        <a href="{{ url_for('buyer.orders') }}" 
+           class="order-tab {% if not status_filter %}active{% endif %}">
+            All <span class="tab-count">({{ status_counts.all }})</span>
+        </a>
+        <a href="{{ url_for('buyer.orders', status='pending') }}" 
+           class="order-tab {% if status_filter == 'pending' %}active{% endif %}">
+            Pending <span class="tab-count">({{ status_counts.pending }})</span>
+        </a>
+        <a href="{{ url_for('buyer.orders', status='paid') }}" 
+           class="order-tab {% if status_filter == 'paid' %}active{% endif %}">
+            Paid <span class="tab-count">({{ status_counts.paid }})</span>
+        </a>
+        <a href="{{ url_for('buyer.orders', status='shipped') }}" 
+           class="order-tab {% if status_filter == 'shipped' %}active{% endif %}">
+            Shipped <span class="tab-count">({{ status_counts.shipped }})</span>
+        </a>
+        <a href="{{ url_for('buyer.orders', status='completed') }}" 
+           class="order-tab {% if status_filter == 'completed' %}active{% endif %}">
+            Completed <span class="tab-count">({{ status_counts.completed }})</span>
+        </a>
+    </div>
+    
+    {% if orders %}
+    <div class="order-list">
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="order-card-header">
+                <div>
+                    <span class="order-no">{{ order.order_no }}</span>
+                    <span class="order-time">{{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else '' }}</span>
+                </div>
+                <span class="order-status-badge status-{{ order.status }}">
+                    {{ {'pending': 'Pending Payment', 'paid': 'Paid', 'shipped': 'Shipped', 'completed': 'Completed', 'cancelled': 'Cancelled'}[order.status] }}
+                </span>
+            </div>
+            
+            <div class="order-card-body">
+                {% for oi in order.items[:3] %}
+                <div class="order-product">
+                    <div class="order-product-image">
+                        <img src="{{ oi.item_image or 'https://placehold.co/60x60/f5f5f5/333?text=No+Image' }}" alt="{{ oi.item_title }}">
+                    </div>
+                    <div class="order-product-info">
+                        <div class="order-product-name">{{ oi.item_title }}</div>
+                        <div class="order-product-meta">${{ "%.2f"|format(oi.item_price) }} x {{ oi.quantity }}</div>
+                    </div>
+                    <div class="order-product-price">${{ "%.2f"|format(oi.subtotal) }}</div>
+                </div>
+                {% endfor %}
+                {% if order.items|length > 3 %}
+                <p style="color: #999; font-size: 0.85rem; margin-top: 0.5rem;">
+                    ... and {{ order.items|length - 3 }} more item(s)
+                </p>
+                {% endif %}
+            </div>
+            
+            <div class="order-card-footer">
+                <div class="order-total">
+                    {{ order.item_count }} item(s) &nbsp; Total: <span>${{ "%.2f"|format(order.total_amount) }}</span>
+                </div>
+                <div class="order-actions">
+                    <a href="{{ url_for('buyer.order_detail', order_no=order.order_no) }}" class="btn btn-order-detail">Details</a>
+                    {% if order.status == 'pending' %}
+                    <button class="btn btn-order-pay" onclick="payOrder('{{ order.order_no }}')">Pay Now</button>
+                    <button class="btn btn-order-cancel" onclick="cancelOrder('{{ order.order_no }}')">Cancel</button>
+                    {% endif %}
+                    {% if order.status == 'shipped' %}
+                    <button class="btn btn-order-pay" onclick="completeOrder('{{ order.order_no }}')">Confirm Receipt</button>
+                    {% endif %}
+                    {% if order.status == 'completed' %}
+                        {% set ns = namespace(all_reviewed=true) %}
+                        {% for oi in order.items %}
+                            {% if oi.id not in reviewed_oi_ids %}
+                                {% set ns.all_reviewed = false %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if ns.all_reviewed %}
+                        <span style="color:#48bb78; font-size:0.85rem; font-weight:600;">✓ All Reviewed</span>
+                        {% else %}
+                        <a href="{{ url_for('buyer.order_detail', order_no=order.order_no) }}" class="btn btn-order-pay" style="font-size:0.8rem;">Write Review</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="{{ url_for('buyer.orders', status=status_filter, page=page-1) }}" class="page-btn">Prev</a>
+        {% endif %}
+        
+        {% set start_page = [1, page - 2]|max %}
+        {% set end_page = [total_pages, page + 2]|min %}
+        
+        {% if start_page > 1 %}
+        <a href="{{ url_for('buyer.orders', status=status_filter, page=1) }}" class="page-btn">1</a>
+        {% if start_page > 2 %}<span class="page-btn" style="border:none;">...</span>{% endif %}
+        {% endif %}
+        
+        {% for p in range(start_page, end_page + 1) %}
+        <a href="{{ url_for('buyer.orders', status=status_filter, page=p) }}" 
+           class="page-btn {% if p == page %}active{% endif %}">{{ p }}</a>
+        {% endfor %}
+        
+        {% if end_page < total_pages %}
+        {% if end_page < total_pages - 1 %}<span class="page-btn" style="border:none;">...</span>{% endif %}
+        <a href="{{ url_for('buyer.orders', status=status_filter, page=total_pages) }}" class="page-btn">{{ total_pages }}</a>
+        {% endif %}
+        
+        {% if page < total_pages %}
+        <a href="{{ url_for('buyer.orders', status=status_filter, page=page+1) }}" class="page-btn">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="empty-orders">
+        <div class="empty-orders-icon">Orders</div>
+        <h2>No orders found</h2>
+        <p>{% if status_filter %}No {{ status_filter }} orders yet.{% else %}You haven't placed any orders yet.{% endif %}</p>
+        <a href="{{ url_for('buyer.index') }}" class="btn btn-primary">Start Shopping</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+async function payOrder(orderNo) {
+    if (!confirm('Confirm payment for this order?')) return;
+    try {
+        const resp = await fetch(`/api/order/${orderNo}/pay`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        const data = await resp.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Payment failed');
+        }
+    } catch (e) {
+        alert('Network error');
+    }
+}
+
+async function cancelOrder(orderNo) {
+    const reason = prompt('Reason for cancellation (optional):');
+    if (reason === null) return;
+    try {
+        const resp = await fetch(`/api/order/${orderNo}/cancel`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({cancel_reason: reason})
+        });
+        const data = await resp.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Cancel failed');
+        }
+    } catch (e) {
+        alert('Network error');
+    }
+}
+
+async function completeOrder(orderNo) {
+    if (!confirm('Confirm you have received the items?')) return;
+    try {
+        const resp = await fetch(`/api/order/${orderNo}/complete`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        const data = await resp.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Failed');
+        }
+    } catch (e) {
+        alert('Network error');
+    }
+}
+
+// Progressive enhancement: refresh status tab counts from order_service.
+// Jinja-rendered order list stays as the no-JS fallback; failures are silent.
+document.addEventListener('DOMContentLoaded', async function () {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get('status') || 'all';
+        const resp = await fetch('/api/orders?status=' + encodeURIComponent(status), {
+            headers: {'Accept': 'application/json'}
+        });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const counts = data && data.status_counts;
+        if (!counts) return;
+        // Map each tab to its status via its href's ?status= param (no param = "all").
+        document.querySelectorAll('.order-tab').forEach(function (tab) {
+            const href = tab.getAttribute('href') || '';
+            const qs = href.indexOf('?') >= 0 ? href.slice(href.indexOf('?') + 1) : '';
+            const tabStatus = new URLSearchParams(qs).get('status') || 'all';
+            const countEl = tab.querySelector('.tab-count');
+            if (countEl && counts[tabStatus] !== undefined && counts[tabStatus] !== null) {
+                countEl.textContent = '(' + counts[tabStatus] + ')';
+            }
+        });
+    } catch (e) {
+        // optional enhancement only; ignore errors
+    }
+});
+</script>
+{% endblock %}

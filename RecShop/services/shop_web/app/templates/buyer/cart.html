@@ -1,0 +1,228 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}Shopping Cart - ShopWeb{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="cart-container container">
+    <h1 class="page-title">Shopping Cart</h1>
+    
+    {% if cart_items %}
+    <div class="cart-content">
+        <div class="cart-items-section">
+            {% for item in cart_items %}
+            <div class="cart-item" data-cart-id="{{ item.id }}">
+                <div class="item-image">
+                    <img src="{{ item.item.image }}" alt="{{ item.item.name }}">
+                </div>
+                
+                <div class="item-details">
+                    <h3 class="item-name">{{ item.item.name }}</h3>
+                    <p class="item-category">{{ item.item.category }}</p>
+                    {% if item.item.brand %}
+                    <p class="item-brand">Brand: {{ item.item.brand }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="item-price">
+                    <span class="price-label">Price:</span>
+                    <span class="price-value">${{ "%.2f"|format(item.item.price) }}</span>
+                </div>
+                
+                <div class="item-quantity">
+                    <button class="qty-btn minus" data-cart-id="{{ item.id }}">-</button>
+                    <input type="number" class="qty-input" value="{{ item.quantity }}" min="1" max="99" 
+                           data-cart-id="{{ item.id }}" readonly>
+                    <button class="qty-btn plus" data-cart-id="{{ item.id }}">+</button>
+                </div>
+                
+                <div class="item-subtotal">
+                    <span class="subtotal-label">Subtotal:</span>
+                    <span class="subtotal-value" data-cart-id="{{ item.id }}">${{ "%.2f"|format(item.subtotal) }}</span>
+                </div>
+                
+                <div class="item-actions">
+                    <button class="btn-remove" data-cart-id="{{ item.id }}">
+                        <span>×</span>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="cart-summary">
+            <h2>Order Summary</h2>
+            
+            <div class="summary-row">
+                <span>Items:</span>
+                <span id="total-items">{{ cart_items|length }}</span>
+            </div>
+            
+            <div class="summary-row">
+                <span>Total Quantity:</span>
+                <span id="total-quantity">{{ cart_items|sum(attribute='quantity') }}</span>
+            </div>
+            
+            <div class="summary-divider"></div>
+            
+            <div class="summary-row total">
+                <span>Total Amount:</span>
+                <span id="total-amount">${{ "%.2f"|format(total_amount) }}</span>
+            </div>
+            
+            <a href="{{ url_for('buyer.checkout') }}" class="btn btn-primary btn-block btn-checkout">Proceed to Checkout</a>
+            <a href="{{ url_for('buyer.index') }}" class="btn btn-primary btn-block btn-continue">Continue Shopping</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <div class="empty-icon">Cart</div>
+        <h2>Your cart is empty</h2>
+        <p>Add some products to get started!</p>
+        <a href="{{ url_for('buyer.index') }}" class="btn btn-primary">Start Shopping</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quantity increase
+    document.querySelectorAll('.qty-btn.plus').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const cartId = this.dataset.cartId;
+            const input = document.querySelector(`.qty-input[data-cart-id="${cartId}"]`);
+            const newQty = parseInt(input.value) + 1;
+            if (newQty <= 99) {
+                updateQuantity(cartId, newQty);
+            }
+        });
+    });
+    
+    // Quantity decrease
+    document.querySelectorAll('.qty-btn.minus').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const cartId = this.dataset.cartId;
+            const input = document.querySelector(`.qty-input[data-cart-id="${cartId}"]`);
+            const newQty = parseInt(input.value) - 1;
+            if (newQty >= 1) {
+                updateQuantity(cartId, newQty);
+            }
+        });
+    });
+    
+    // Remove item
+    document.querySelectorAll('.btn-remove').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const cartId = this.dataset.cartId;
+            if (confirm('Remove this item from cart?')) {
+                removeItem(cartId);
+            }
+        });
+    });
+    
+    // Update quantity
+    function updateQuantity(cartId, quantity) {
+        fetch(`/api/cart/update/${cartId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantity: quantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update input
+                const input = document.querySelector(`.qty-input[data-cart-id="${cartId}"]`);
+                input.value = quantity;
+                
+                // Update subtotal
+                const subtotalEl = document.querySelector(`.subtotal-value[data-cart-id="${cartId}"]`);
+                subtotalEl.textContent = '$' + data.subtotal.toFixed(2);
+                
+                // Recalculate total
+                recalculateTotal();
+            } else {
+                alert('Failed to update: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update cart');
+        });
+    }
+    
+    // Remove item
+    function removeItem(cartId) {
+        fetch(`/api/cart/remove/${cartId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove item from DOM
+                const itemEl = document.querySelector(`.cart-item[data-cart-id="${cartId}"]`);
+                itemEl.remove();
+                
+                // Update cart count in header if exists
+                updateHeaderCartCount(data.cart_count);
+                
+                // Check if cart is empty
+                if (document.querySelectorAll('.cart-item').length === 0) {
+                    location.reload();
+                } else {
+                    recalculateTotal();
+                }
+            } else {
+                alert('Failed to remove: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to remove item');
+        });
+    }
+    
+    // Recalculate total
+    function recalculateTotal() {
+        let totalAmount = 0;
+        let totalQuantity = 0;
+        let totalItems = 0;
+        
+        document.querySelectorAll('.cart-item').forEach(item => {
+            const cartId = item.dataset.cartId;
+            const subtotalText = document.querySelector(`.subtotal-value[data-cart-id="${cartId}"]`).textContent;
+            const subtotal = parseFloat(subtotalText.replace('$', ''));
+            const quantity = parseInt(document.querySelector(`.qty-input[data-cart-id="${cartId}"]`).value);
+            
+            totalAmount += subtotal;
+            totalQuantity += quantity;
+            totalItems++;
+        });
+        
+        document.getElementById('total-items').textContent = totalItems;
+        document.getElementById('total-quantity').textContent = totalQuantity;
+        document.getElementById('total-amount').textContent = '$' + totalAmount.toFixed(2);
+    }
+    
+    // Update header cart count
+    function updateHeaderCartCount(count) {
+        const cartBadge = document.querySelector('.cart-badge');
+        if (cartBadge) {
+            if (count > 0) {
+                cartBadge.textContent = count;
+                cartBadge.style.display = 'inline-block';
+            } else {
+                cartBadge.style.display = 'none';
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

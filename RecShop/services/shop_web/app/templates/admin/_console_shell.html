@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Console{% endblock %} - ShopWeb</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/console_base.css') }}">
+    {% block styles %}{% endblock %}
+</head>
+<body>
+<aside class="sidebar">
+    <div class="brand">{% block console_brand %}Console{% endblock %}</div>
+    <nav class="nav">
+        {% block console_nav %}{% endblock %}
+    </nav>
+</aside>
+
+<header class="header">
+    <div class="header-title">{% block header_title %}Console{% endblock %}</div>
+    <div class="header-user">
+        {% block console_header_user %}{% endblock %}
+    </div>
+</header>
+
+<main class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for c, m in messages %}
+                    <div class="alert alert-{{ c }}">{{ m }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</main>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

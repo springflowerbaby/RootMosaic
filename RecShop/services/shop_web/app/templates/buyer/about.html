@@ -1,0 +1,16 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}About - ShopWeb{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="hero about-hero">
+        <h1>About Us</h1>
+        <p>This is the about page of the demo project website</p>
+    </div>
+</div>
+{% endblock %}

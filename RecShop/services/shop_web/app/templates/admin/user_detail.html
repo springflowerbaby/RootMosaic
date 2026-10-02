@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block title %}User Details{% endblock %}
+{% block header_title %}User Details{% endblock %}
+{% block content %}
+<h1 class="page-title">User Details</h1>
+<div class="card">
+    <p><b>User Token:</b> {{ user.user_token }}</p>
+    <p><b>Username:</b> {{ user.username or '-' }}</p>
+    <p><b>Email:</b> {{ user.email or '-' }}</p>
+    <p><b>Status:</b> <span class="badge b-{{ user.status }}">{{ user.status }}</span></p>
+    <p><b>Created At:</b> {{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else '-' }}</p>
+</div>
+<div class="card table-wrap">
+    <h3 style="margin-bottom:8px;">Recent Orders</h3>
+    <table>
+        <thead><tr><th>Order No.</th><th>Status</th><th>Total</th><th>Created At</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for order in recent_orders %}
+        <tr>
+            <td>{{ order.order_no }}</td>
+            <td><span class="badge b-{{ order.status }}">{{ order.status }}</span></td>
+            <td>${{ "%.2f"|format(order.total_amount) }}</td>
+            <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else '-' }}</td>
+            <td><a class="btn btn-sm" href="{{ url_for('admin.order_detail', order_no=order.order_no) }}">View</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,103 @@
+{
+  "schema_version": "recshop-collection-environment-v1",
+  "binding_mode": "observed",
+  "kube_context": "YOUR-CONTEXT",
+  "namespace": "recshop-example",
+  "node_name": "replace-with-node-name",
+  "chaos_namespace": "chaos-mesh",
+  "cluster_uid": "REPLACE-WITH-KUBE-SYSTEM-UID",
+  "namespace_uid": "REPLACE-WITH-NAMESPACE-UID",
+  "node_uid": "REPLACE-WITH-NODE-UID",
+  "request_proxy_port": 18005,
+  "database": {
+    "credential_file": ".env.collection",
+    "server_uuid": "REPLACE-WITH-DATABASE-SERVER-UUID",
+    "checksums": {
+      "items": "REPLACE-WITH-OBSERVED-CHECKSUM",
+      "inventory": "REPLACE-WITH-OBSERVED-CHECKSUM"
+    },
+    "name": "shopify2"
+  },
+  "paths": {
+    "output_root": "outputs/collection/attempts",
+    "artifact_root": "runs/collection/artifacts",
+    "batch_root": "runs/collection/batches",
+    "lease_root": ".recshop-collection/environment-leases"
+  },
+  "telemetry": {
+    "prometheus": "http://127.0.0.1:19090",
+    "jaeger": "http://127.0.0.1:16686",
+    "loki": "http://127.0.0.1:3100",
+    "metrics_exporter": "http://127.0.0.1:18899",
+    "metrics_endpoint_for_apps": "http://host.docker.internal:14317",
+    "metrics_scrape_url": "http://m1-otel-metrics:8889/metrics",
+    "metrics_collector_name": "recshop-m1-otel-metrics",
+    "metrics_collector_config_path": "/etc/m1/otel-metrics-config.yaml",
+    "prometheus_targets": {
+      "otel-collector": "http://m1-otel-metrics:8889/metrics",
+      "cadvisor": "http://host.docker.internal:8001/api/v1/nodes/replace-with-node-name/proxy/metrics/cadvisor",
+      "kube-state-metrics": "http://host.docker.internal:8001/api/v1/namespaces/recshop-example/services/kube-state-metrics:8080/proxy/metrics",
+      "cri-resource": "http://host.docker.internal:8001/api/v1/namespaces/recshop-example/services/m1-cri-resource-exporter:9738/proxy/metrics"
+    }
+  },
+  "windows_startup": {
+    "enabled": false,
+    "bind_sources": {},
+    "docker_desktop_executable": "C:/Program Files/Docker/Docker/Docker Desktop.exe",
+    "proxy_origin": "http://127.0.0.1:8001",
+    "proxy_listen_address": "0.0.0.0",
+    "proxy_port": 8001,
+    "container_network": "ops_default",
+    "prometheus_volume": "REPLACE-WITH-YOUR-METRICS-TSDB-VOLUME",
+    "containers": {
+      "recweb2-jaeger": {
+        "image": "jaegertracing/all-in-one:1.76.0",
+        "project": "ops",
+        "service": "jaeger",
+        "ports": {
+          "16686/tcp": "16686"
+        }
+      },
+      "recweb2-loki": {
+        "image": "grafana/loki:3.5.3",
+        "project": "ops",
+        "service": "loki",
+        "ports": {
+          "3100/tcp": "3100"
+        }
+      },
+      "recweb2-otel-collector": {
+        "image": "otel/opentelemetry-collector-contrib:0.128.0",
+        "project": "ops",
+        "service": "otel-collector",
+        "ports": {
+          "4317/tcp": "4317",
+          "4318/tcp": "4318",
+          "8889/tcp": "8889"
+        }
+      },
+      "recshop-m1-otel-metrics": {
+        "image": "otel/opentelemetry-collector-contrib:0.128.0",
+        "project": "recshop-m1-sampling",
+        "service": "m1-otel-metrics",
+        "ports": {
+          "4317/tcp": "14317",
+          "8889/tcp": "18899"
+        }
+      },
+      "recshop-m1-prometheus": {
+        "image": "prom/prometheus:v3.5.0",
+        "project": "recshop-m1-sampling",
+        "service": "m1-prometheus",
+        "ports": {
+          "9090/tcp": "19090"
+        }
+      }
+    }
+  },
+  "protected_roots": [
+    "datasets",
+    "models"
+  ],
+  "additional_deployments": []
+}

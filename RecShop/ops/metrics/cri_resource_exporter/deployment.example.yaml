@@ -1,0 +1,36 @@
+# Replace namespace, node, node UID, image and EACH actual pod target before use.
+# A read-only mounted CRI socket still grants API access; keep this component in a controlled environment.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: m1-cri-resource-exporter
+  namespace: recshop-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: m1-cri-resource-exporter}
+  template:
+    metadata:
+      labels: {app: m1-cri-resource-exporter}
+    spec:
+      nodeSelector: {kubernetes.io/hostname: replace-with-node-name}
+      containers:
+        - name: exporter
+          image: recshop-cri-resource-exporter:replace-with-built-tag
+          args: [--cri-endpoint, unix:///run/containerd/containerd.sock, --listen, '0.0.0.0:9738', --interval, '2', --node, replace-with-node-name, --node-uid, REPLACE_WITH_OBSERVED_NODE_UID, --target, 'pod:recshop-example/replace-with-pod-name/replace-with-container-name']
+          ports: [{name: metrics, containerPort: 9738}]
+          readinessProbe: {httpGet: {path: /metrics, port: metrics}, initialDelaySeconds: 3, periodSeconds: 5}
+          resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {memory: 256Mi}}
+          volumeMounts: [{name: cri, mountPath: /run/containerd/containerd.sock, readOnly: true}]
+      volumes:
+        - name: cri
+          hostPath: {path: /run/containerd/containerd.sock, type: Socket}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: m1-cri-resource-exporter
+  namespace: recshop-example
+spec:
+  selector: {app: m1-cri-resource-exporter}
+  ports: [{name: metrics, port: 9738, targetPort: metrics}]

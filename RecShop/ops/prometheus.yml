@@ -1,0 +1,30 @@
+global:
+  # 历史指标采样配置：15s → 2s，以增加短观测窗内的采样点数。
+  # 2s 是 runner 自采探针的节拍,对齐后 30s 窗 ≈15 个采样点。
+  # ⚠ 重启只用 `docker compose -f ops/docker-compose.otel.yml restart prometheus`
+  #    禁 `up --force-recreate` / `down`(TSDB 在容器可写层,会被清空)。
+  scrape_interval: 2s
+
+scrape_configs:
+  - job_name: 'otel-collector'
+    static_configs:
+      - targets: ['otel-collector:8889']
+
+  # ---- 6a Q2: K8S 容器/pod 基础设施指标(参考27项资源指标及RCAEval/Eadro使用的基础观测面)----
+  # 经宿主 kubectl proxy(host.docker.internal:8001, 需在采集前确认代理已运行)→ API-server proxy → kubelet cAdvisor / kube-state-metrics。
+  # NodePort 在 docker-desktop 不映射宿主 localhost, 故走 kubectl proxy(或更稳的 client-cert 方案见 §11/runbook)。
+  # M9: cadvisor / kube-state 单列 5s——两者都经 kubectl proxy 8001,且底层刷新本就慢
+  #   (kubelet cAdvisor housekeeping ~10s;kube-state 是慢变状态量)。2s 刮只会复读 + 压 proxy8001。
+  #   ⚠ 故 container_* 的"独立值"密度低于行数密度(如实写进 EVAL_NOTES,勿 overclaim)。
+  - job_name: 'cadvisor'
+    scheme: http
+    scrape_interval: 5s
+    metrics_path: /api/v1/nodes/desktop-control-plane/proxy/metrics/cadvisor
+    static_configs:
+      - targets: ['host.docker.internal:8001']
+  - job_name: 'kube-state-metrics'
+    scheme: http
+    scrape_interval: 5s
+    metrics_path: /api/v1/namespaces/recweb-chaos/services/kube-state-metrics:8080/proxy/metrics
+    static_configs:
+      - targets: ['host.docker.internal:8001']

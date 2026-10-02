@@ -1,0 +1,114 @@
+{% extends "merchant/base.html" %}
+
+{% block title %}Order {{ order.order_no }}{% endblock %}
+{% block header_title %}Order Details{% endblock %}
+
+{% block content %}
+<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+    <a href="{{ url_for('merchant.orders') }}" class="btn btn-outline btn-sm">← Back to Orders</a>
+    <h1 class="page-title" style="margin-bottom:0;">Order {{ order.order_no }}</h1>
+</div>
+
+<!-- Order status -->
+<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+            <div style="font-size:.85rem;color:#95a5a6;">Order Status</div>
+            {% set status_map = {'pending':'Pending Payment','paid':'Pending Shipment','shipped':'Shipped','completed':'Completed','cancelled':'Cancelled'} %}
+            {% set badge_map = {'pending':'pending','paid':'pending','shipped':'active','completed':'active','cancelled':'removed'} %}
+            <span class="badge badge-{{ badge_map.get(order.status, 'draft') }}" style="font-size:.9rem;padding:.3rem .8rem;">
+                {{ status_map.get(order.status, order.status) }}
+            </span>
+        </div>
+        {% if order.status == 'paid' %}
+        <button class="btn btn-success" onclick="shipOrder('{{ order.order_no }}')">Confirm Shipment</button>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Order info -->
+<div class="card">
+    <h3 style="margin-bottom:.8rem;">Order Information</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;font-size:.9rem;">
+        <div><span style="color:#95a5a6;">Order No.:</span>{{ order.order_no }}</div>
+        <div><span style="color:#95a5a6;">Created At:</span>{{ order.created_at.strftime('%Y-%m-%d %H:%M:%S') if order.created_at else '-' }}</div>
+        <div><span style="color:#95a5a6;">Recipient:</span>{{ order.snapshot_receiver_name }}</div>
+        <div><span style="color:#95a5a6;">Phone:</span>{{ order.snapshot_receiver_phone }}</div>
+        <div style="grid-column:1/-1;"><span style="color:#95a5a6;">Address:</span>{{ order.snapshot_address }}</div>
+        {% if order.remark %}
+        <div style="grid-column:1/-1;"><span style="color:#95a5a6;">Buyer Note:</span>{{ order.remark }}</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- My items in this order -->
+<div class="card" style="padding:0;overflow-x:auto;">
+    <div style="padding:1rem 1.2rem .5rem;"><h3>My Item Details</h3></div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Unit Price</th>
+                <th>Quantity</th>
+                <th style="text-align:right;">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set my_total = namespace(value=0) %}
+            {% for oi in my_items %}
+            {% set my_total.value = my_total.value + (oi.subtotal|float) %}
+            <tr>
+                <td>
+                    <div style="display:flex;align-items:center;gap:.6rem;">
+                        <img src="{{ oi.item_image or 'https://placehold.co/40x40/f5f5f5/999?text=N' }}" 
+                             style="width:40px;height:40px;object-fit:cover;border-radius:4px;">
+                        <span>{{ oi.item_title }}</span>
+                    </div>
+                </td>
+                <td>${{ "%.2f"|format(oi.item_price) }}</td>
+                <td>{{ oi.quantity }}</td>
+                <td style="text-align:right;font-weight:600;">${{ "%.2f"|format(oi.subtotal) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div style="padding:.8rem 1.2rem;text-align:right;border-top:2px solid #eee;">
+        <span style="color:#95a5a6;">My Items Total:</span>
+        <span style="font-size:1.2rem;font-weight:700;color:#e67e22;">${{ "%.2f"|format(my_total.value) }}</span>
+    </div>
+</div>
+
+<!-- Timeline -->
+<div class="card">
+    <h3 style="margin-bottom:.8rem;">Timeline</h3>
+    <div style="font-size:.9rem;line-height:2;">
+        <div>Created At: {{ order.created_at.strftime('%Y-%m-%d %H:%M:%S') if order.created_at else '-' }}</div>
+        {% if order.paid_at %}
+        <div>Paid At: {{ order.paid_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+        {% endif %}
+        {% if order.shipped_at %}
+        <div>Shipped At: {{ order.shipped_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+        {% endif %}
+        {% if order.completed_at %}
+        <div>Completed At: {{ order.completed_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+        {% endif %}
+        {% if order.cancelled_at %}
+        <div>Cancelled At: {{ order.cancelled_at.strftime('%Y-%m-%d %H:%M:%S') }}{% if order.cancel_reason %} ({{ order.cancel_reason }}){% endif %}</div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+async function shipOrder(orderNo) {
+    if (!confirm('Confirm shipment?')) return;
+    try {
+        const resp = await fetch(`/merchant/api/orders/${orderNo}/ship`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'}
+        });
+        const data = await resp.json();
+        if (data.success) { location.reload(); }
+        else { alert(data.message || 'Operation failed'); }
+    } catch (e) { alert('Network error'); }
+}
+</script>
+{% endblock %}

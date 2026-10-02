@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% block title %}Merchant Details{% endblock %}
+{% block header_title %}Merchant Details{% endblock %}
+{% block content %}
+<h1 class="page-title">Merchant #{{ merchant.id }}</h1>
+<div class="card">
+    <p><b>Name:</b> {{ merchant.username or '-' }}</p>
+    <p><b>Email:</b> {{ merchant.email }}</p>
+    <p><b>Phone:</b> {{ merchant.phone or '-' }}</p>
+    <p><b>Status:</b> <span class="badge b-{{ merchant.status }}">{{ merchant.status }}</span></p>
+</div>
+<div class="card table-wrap">
+    <h3 style="margin-bottom:8px;">Recent Products</h3>
+    <table>
+        <thead><tr><th>item_id</th><th>Title</th><th>Status</th><th>Price</th><th>Updated At</th></tr></thead>
+        <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.item_id }}</td>
+            <td>{{ item.title or '-' }}</td>
+            <td><span class="badge b-{{ item.status }}">{{ item.status }}</span></td>
+            <td>{{ ("%.2f"|format(item.price)) if item.price else '-' }}</td>
+            <td>{{ item.updated_at.strftime('%Y-%m-%d %H:%M') if item.updated_at else '-' }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

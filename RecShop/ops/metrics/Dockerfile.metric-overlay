@@ -1,0 +1,16 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+ARG SERVICE_DESTINATION
+ARG EXPECTED_BASE_SOURCE_SHA256
+ARG BASE_IMAGE_ID
+ARG SOURCE_AFTER_SHA256
+COPY verify_base_source.py /opt/m1-sampling/verify_base_source.py
+RUN ["python", "/opt/m1-sampling/verify_base_source.py"]
+COPY service.py ${SERVICE_DESTINATION}
+COPY otel_metric_config.py /app/shared/otel_metric_config.py
+LABEL org.recshop.m1.kind="metric-interval-overlay" \
+      org.recshop.m1.base-image-id="${BASE_IMAGE_ID}" \
+      org.recshop.m1.source-sha256="${SOURCE_AFTER_SHA256}"
+# No ENV period here: normal/default behavior remains 15000 ms. The collection Deployment
+# explicitly selects OTEL_METRIC_EXPORT_INTERVAL=2000 after root validation.
+# No dependency/model download, no entrypoint/CMD/user/working-directory change.

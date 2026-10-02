@@ -1,0 +1,283 @@
+{% extends "admin/_console_shell.html" %}
+
+{% block title %}Merchant Console{% endblock %}
+{% block console_brand %}Merchant Console{% endblock %}
+{% block header_title %}Merchant Console{% endblock %}
+
+{% block console_nav %}
+<a href="{{ url_for('merchant.dashboard') }}" class="{% if request.endpoint == 'merchant.dashboard' %}active{% endif %}">Dashboard</a>
+<a href="{{ url_for('merchant.products') }}" class="{% if request.endpoint and 'product' in request.endpoint %}active{% endif %}">Products</a>
+<a href="{{ url_for('merchant.orders') }}" class="{% if request.endpoint and 'order' in request.endpoint %}active{% endif %}">Orders</a>
+<a href="{{ url_for('merchant.reviews') }}" class="{% if request.endpoint == 'merchant.reviews' %}active{% endif %}">Reviews</a>
+<a href="{{ url_for('merchant.stats') }}" class="{% if request.endpoint == 'merchant.stats' %}active{% endif %}">Sales Analytics</a>
+<a href="{{ url_for('merchant.shop_settings') }}" class="{% if request.endpoint == 'merchant.shop_settings' %}active{% endif %}">Shop Settings</a>
+<a href="{{ url_for('merchant.settings') }}" class="{% if request.endpoint == 'merchant.settings' %}active{% endif %}">Account Settings</a>
+<a href="{{ url_for('merchant.finance') }}" class="{% if request.endpoint == 'merchant.finance' %}active{% endif %}">Revenue Overview</a>
+{% endblock %}
+
+{% block console_header_user %}
+<span class="merchant-name">{{ current_user.username or current_user.email }}</span>
+<a href="{{ url_for('merchant.logout') }}" class="btn-logout">Logout</a>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Merchant AI Assistant Chat Widget */
+    .mc-chat-widget {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        z-index: 1100;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .mc-chat-btn {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        border: none;
+        box-shadow: 0 4px 14px rgba(102,126,234,.4);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: 700;
+        transition: transform .25s, box-shadow .25s;
+    }
+    .mc-chat-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(102,126,234,.55); }
+    .mc-chat-btn .badge {
+        position: absolute;
+        top: -2px; right: -2px;
+        background: #ef4444;
+        color: #fff;
+        font-size: .65rem;
+        width: 18px; height: 18px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+    }
+
+    .mc-chat-window {
+        position: absolute;
+        bottom: 64px;
+        right: 0;
+        width: 420px;
+        height: 540px;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 8px 30px rgba(0,0,0,.18);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        animation: mcSlideIn .3s ease;
+    }
+    @keyframes mcSlideIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .mc-chat-window.open { display: flex; }
+
+    .mc-chat-header {
+        padding: .85rem 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .mc-chat-header .title { font-weight: 600; font-size: 1rem; }
+    .mc-chat-header .close-btn {
+        background: none; border: none; color: #fff;
+        cursor: pointer; font-size: 1.4rem; line-height: 1; padding: 0 4px;
+    }
+
+    .mc-chat-messages {
+        flex: 1;
+        padding: .85rem;
+        overflow-y: auto;
+        background: #f7f8fa;
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+    }
+    .mc-msg {
+        max-width: 82%;
+        padding: .75rem 1rem;
+        border-radius: 12px;
+        font-size: .93rem;
+        line-height: 1.6;
+        word-break: break-word;
+        white-space: pre-wrap;
+    }
+    .mc-msg.ai {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        color: #333;
+    }
+    .mc-msg.user {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+    }
+    .mc-msg.ai.loading { color: #999; font-style: italic; }
+
+    .mc-chat-input-area {
+        padding: .75rem;
+        border-top: 1px solid #eee;
+        background: #fff;
+        display: flex;
+        gap: .45rem;
+        align-items: center;
+    }
+    .mc-chat-input-area input {
+        flex: 1;
+        padding: .7rem .9rem;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+        font-size: .93rem;
+        transition: border-color .3s;
+    }
+    .mc-chat-input-area input:focus { border-color: #667eea; }
+    .mc-chat-input-area button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff; border: none;
+        width: 36px; height: 36px;
+        border-radius: 50%; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-size: .95rem;
+        transition: opacity .2s;
+    }
+    .mc-chat-input-area button:disabled { opacity: .5; cursor: not-allowed; }
+
+    .mc-suggestions {
+        display: flex; flex-wrap: wrap; gap: .4rem;
+        padding: 0 .85rem .6rem;
+        background: #f7f8fa;
+    }
+    .mc-suggestions button {
+        background: #fff; border: 1px solid #d1d5db; border-radius: 16px;
+        padding: .3rem .7rem; font-size: .8rem; color: #555;
+        cursor: pointer; transition: all .2s;
+    }
+    .mc-suggestions button:hover { border-color: #667eea; color: #667eea; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Merchant AI Assistant Chat Widget -->
+<div class="mc-chat-widget">
+    <button class="mc-chat-btn" id="mcChatBtn" title="AI Business Assistant">AI</button>
+    <div class="mc-chat-window" id="mcChatWindow">
+        <div class="mc-chat-header">
+            <span class="title">AI Business Assistant</span>
+            <button class="close-btn" id="mcCloseChat">&times;</button>
+        </div>
+        <div class="mc-chat-messages" id="mcChatMessages">
+            <div class="mc-msg ai">Hello! I'm your AI business assistant. I can analyze your store data including sales trends, order status, product performance, and customer reviews. How can I help you today?</div>
+        </div>
+        <div class="mc-suggestions" id="mcSuggestions">
+            <button data-q="Summarize my store performance this week">Weekly summary</button>
+            <button data-q="Are there any orders I need to ship?">Pending shipments</button>
+            <button data-q="How are my product reviews? Any I should reply to?">Review status</button>
+            <button data-q="What are my top selling products?">Top products</button>
+        </div>
+        <div class="mc-chat-input-area">
+            <input type="text" id="mcChatInput" placeholder="Ask about your store...">
+            <button id="mcSendBtn">&#x27A4;</button>
+        </div>
+    </div>
+</div>
+<script>
+(function() {
+    const btn       = document.getElementById('mcChatBtn');
+    const win       = document.getElementById('mcChatWindow');
+    const closeBtn  = document.getElementById('mcCloseChat');
+    const input     = document.getElementById('mcChatInput');
+    const sendBtn   = document.getElementById('mcSendBtn');
+    const msgBox    = document.getElementById('mcChatMessages');
+    const sugBox    = document.getElementById('mcSuggestions');
+
+    let history = [];
+
+    function toggle() { win.classList.toggle('open'); if (win.classList.contains('open')) input.focus(); }
+    btn.addEventListener('click', toggle);
+    closeBtn.addEventListener('click', toggle);
+
+    function addMsg(text, type) {
+        const div = document.createElement('div');
+        div.className = 'mc-msg ' + type;
+        div.textContent = text;
+        msgBox.appendChild(div);
+        msgBox.scrollTop = msgBox.scrollHeight;
+        return div;
+    }
+
+    function setLoading(on) {
+        if (on) {
+            const el = addMsg('Thinking...', 'ai loading');
+            el.id = 'mc-loading';
+        } else {
+            const el = document.getElementById('mc-loading');
+            if (el) el.remove();
+        }
+    }
+
+    async function send(text) {
+        if (!text.trim()) return;
+        addMsg(text, 'user');
+        input.value = '';
+        input.disabled = true;
+        sendBtn.disabled = true;
+
+        // Hide suggestions after first real message
+        if (sugBox) sugBox.style.display = 'none';
+
+        history.push({ role: 'user', content: text });
+        setLoading(true);
+
+        try {
+            const resp = await fetch('{{ url_for("merchant.merchant_chat") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: history })
+            });
+            const data = await resp.json();
+            setLoading(false);
+
+            if (data.success) {
+                addMsg(data.message, 'ai');
+                history.push({ role: 'assistant', content: data.message });
+            } else {
+                addMsg('Sorry, ' + (data.message || data.error || 'service temporarily unavailable'), 'ai');
+            }
+        } catch (e) {
+            setLoading(false);
+            addMsg('Network error, please try again.', 'ai');
+            console.error('MerchantChat error:', e);
+        } finally {
+            input.disabled = false;
+            sendBtn.disabled = false;
+            input.focus();
+        }
+    }
+
+    sendBtn.addEventListener('click', function() { send(input.value); });
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input.value); }
+    });
+
+    // Quick suggestion buttons
+    sugBox.querySelectorAll('button[data-q]').forEach(function(b) {
+        b.addEventListener('click', function() { send(b.dataset.q); });
+    });
+})();
+</script>
+{% endblock %}

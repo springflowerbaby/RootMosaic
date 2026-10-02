@@ -1,0 +1,108 @@
+# Source template: configure namespace, images, database, assets and observability before use.
+# The portable business deployment entry renders the 25 application templates.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+  namespace: recshop-example
+  labels:
+    app: order
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      enableServiceLinks: false
+      containers:
+      - name: order
+        image: recweb-order:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 5010
+        env:
+        - name: NACOS_ENABLED
+          value: 'false'
+        - name: ORDER_SERVICE_HOST
+          value: 0.0.0.0
+        - name: CATALOG_SERVICE_URL
+          value: http://catalog:5005
+        - name: DB_HOST
+          value: mysql.example.internal
+        - name: DB_PORT
+          value: '3306'
+        - name: DB_NAME
+          value: shopify2
+        - name: DB_USER
+          value: recshop
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-cred
+              key: password
+        - name: OTEL_ENABLED
+          value: 'true'
+        - name: OTEL_SERVICE_NAME
+          value: order_service
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://host.docker.internal:4317
+        - name: OTEL_EXPORTER_OTLP_PROTOCOL
+          value: grpc
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: k8s.pod.name=$(POD_NAME),k8s.namespace.name=$(POD_NAMESPACE),k8s.node.name=$(NODE_NAME)
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5010
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5010
+          initialDelaySeconds: 15
+          periodSeconds: 20
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+  namespace: recshop-example
+  labels:
+    app: order
+spec:
+  type: ClusterIP
+  selector:
+    app: order
+  ports:
+  - name: http
+    port: 5010
+    targetPort: 5010

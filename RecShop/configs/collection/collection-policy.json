@@ -1,0 +1,13 @@
+{
+  "schema_version": "recshop-collection-policy-v1",
+  "formal_phase_lengths_s": [
+    300,
+    300,
+    300
+  ],
+  "metric_interval_s": 2,
+  "source_identity_required": true,
+  "clean_drained_recovery_required": true,
+  "decision_import": "same_attempt_hash_bound",
+  "nonpassing_quality_preserved": true
+}

@@ -1,0 +1,44 @@
+{% extends "admin/base.html" %}
+{% block title %}Order Details{% endblock %}
+{% block header_title %}Order Details{% endblock %}
+{% block content %}
+<h1 class="page-title">Order {{ order.order_no }}</h1>
+<div class="card">
+    <p><b>User:</b> {{ order.user_token }}</p>
+    <p><b>Status:</b> <span class="badge b-{{ order.status }}">{{ order.status }}</span></p>
+    <p><b>Total Amount:</b> ${{ "%.2f"|format(order.total_amount) }}</p>
+    <p><b>Recipient:</b> {{ order.snapshot_receiver_name }} / {{ order.snapshot_receiver_phone }}</p>
+    <p><b>Address Snapshot:</b> {{ order.snapshot_address }}</p>
+    <p><b>Remark:</b> {{ order.remark or '-' }}</p>
+    {% if current_user.role == 'super_admin' and order.status not in ('cancelled', 'completed') %}
+    <button class="btn btn-danger" onclick="forceCancel('{{ order.order_no }}')">Force Cancel Order</button>
+    {% endif %}
+</div>
+<div class="card table-wrap">
+    <h3 style="margin-bottom:8px;">Order Items</h3>
+    <table>
+        <thead><tr><th>Item ID</th><th>Title</th><th>Unit Price</th><th>Quantity</th><th>Subtotal</th></tr></thead>
+        <tbody>
+        {% for oi in order.items %}
+        <tr>
+            <td>{{ oi.item_id }}</td>
+            <td>{{ oi.item_title }}</td>
+            <td>${{ "%.2f"|format(oi.item_price) }}</td>
+            <td>{{ oi.quantity }}</td>
+            <td>${{ "%.2f"|format(oi.subtotal) }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function forceCancel(orderNo) {
+    if (!confirm('Super admin only. Continue?')) return;
+    const resp = await fetch(`/admin/api/orders/${orderNo}/force-cancel`, {method: 'POST'});
+    const data = await resp.json();
+    if (data.success) location.reload(); else alert(data.message || 'Operation failed');
+}
+</script>
+{% endblock %}

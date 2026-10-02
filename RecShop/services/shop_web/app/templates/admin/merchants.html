@@ -1,0 +1,57 @@
+{% extends "admin/base.html" %}
+{% block title %}Merchant Management{% endblock %}
+{% block header_title %}Merchant Management{% endblock %}
+{% block content %}
+<h1 class="page-title">Merchant List</h1>
+<form class="filters" method="get">
+    <select name="status">
+        <option value="">All Statuses</option>
+        {% for s in ['pending','approved','rejected','banned'] %}
+        <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select>
+    <input name="q" placeholder="Search name/email/phone" value="{{ q }}">
+    <button class="btn">Filter</button>
+</form>
+<div style="margin-bottom:8px;color:#6b7280;">
+    All {{ status_counts.all }} / Pending {{ status_counts.pending }} / Approved {{ status_counts.approved }} / Rejected {{ status_counts.rejected }} / Banned {{ status_counts.banned }}
+</div>
+<div class="card table-wrap">
+<table>
+    <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for m in merchants %}
+    <tr>
+        <td>{{ m.id }}</td>
+        <td>{{ m.username or '-' }}</td>
+        <td>{{ m.email }}</td>
+        <td>{{ m.phone or '-' }}</td>
+        <td><span class="badge b-{{ m.status }}">{{ m.status }}</span></td>
+        <td>
+            <a class="btn btn-sm" href="{{ url_for('admin.merchant_detail', merchant_id=m.id) }}">Details</a>
+            <button class="btn btn-sm btn-success" onclick="act({{ m.id }}, 'approve')">Approve</button>
+            <button class="btn btn-sm btn-warning" onclick="act({{ m.id }}, 'reject')">Reject</button>
+            <button class="btn btn-sm btn-danger" onclick="act({{ m.id }}, 'ban')">Ban</button>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% if total_pages > 1 %}
+<div class="pagination">
+    {% for p in range(1, total_pages + 1) %}
+    <a class="{% if p == page %}active{% endif %}" href="{{ url_for('admin.merchants', status=status, q=q, page=p) }}">{{ p }}</a>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script>
+async function act(id, action) {
+    const resp = await fetch(`/admin/api/merchants/${id}/${action}`, {method: 'POST'});
+    const data = await resp.json();
+    if (data.success) location.reload(); else alert(data.message || 'Operation failed');
+}
+</script>
+{% endblock %}

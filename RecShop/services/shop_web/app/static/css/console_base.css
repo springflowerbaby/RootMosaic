@@ -1,0 +1,543 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --sidebar-width: 228px;
+    --header-height: 56px;
+    --bg-body: #f3f4f6;
+    --bg-panel: #0f172a;
+    --bg-panel-soft: #111827;
+    --bg-panel-hover: rgba(99, 102, 241, 0.14);
+    --bg-card: #ffffff;
+    --text-main: #111827;
+    --text-panel: #e5e7eb;
+    --text-muted: #94a3b8;
+    --line-panel: #334155;
+    --line-soft: #e5e7eb;
+    --primary: #475569;
+    --primary-dark: #334155;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-body);
+    color: var(--text-main);
+}
+
+/* Shared sidebar shell */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--bg-panel);
+    color: var(--text-panel);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-brand,
+.brand {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    border-bottom: 1px solid var(--line-panel);
+}
+
+.sidebar-nav,
+.nav {
+    flex: 1;
+    padding: 6px 0;
+    overflow-y: auto;
+}
+
+.sidebar-nav a,
+.nav a {
+    display: block;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 11px 18px;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.sidebar-nav a:hover,
+.nav a:hover {
+    color: #fff;
+    background: var(--bg-panel-hover);
+}
+
+.sidebar-nav a.active,
+.nav a.active {
+    color: #fff;
+    background: var(--bg-panel-hover);
+    border-left-color: var(--primary);
+    font-weight: 600;
+}
+
+/* Shared header shell */
+.main-header,
+.header {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width);
+    right: 0;
+    height: var(--header-height);
+    background: var(--bg-panel-soft);
+    border-bottom: 1px solid var(--line-panel);
+    color: var(--text-panel);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    z-index: 90;
+}
+
+.header-title {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.9rem;
+}
+
+.header-user .merchant-name {
+    color: var(--text-muted);
+}
+
+.header-user .btn-logout {
+    padding: 0.32rem 0.8rem;
+    border: 1px solid var(--line-panel);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+
+.header-user .btn-logout:hover {
+    color: #fff;
+    border-color: #64748b;
+}
+
+/* Shared content shell */
+.main-content,
+.content {
+    margin-left: var(--sidebar-width);
+    margin-top: var(--header-height);
+    min-height: calc(100vh - var(--header-height));
+    padding: 18px;
+}
+
+/* Utilities */
+.page-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #111827;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    filter: brightness(0.97);
+}
+
+.btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.btn-success {
+    background: var(--success);
+    border-color: var(--success);
+    color: #fff;
+}
+
+.btn-warning {
+    background: var(--warning);
+    border-color: var(--warning);
+    color: #111827;
+}
+
+.btn-danger {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+.btn-outline {
+    background: #fff;
+    border-color: #d1d5db;
+    color: #111827;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* Alerts */
+.flash-messages {
+    margin-bottom: 12px;
+}
+
+.alert {
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.alert-warning {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+/* Tables */
+.table-wrap {
+    overflow-x: auto;
+}
+
+table,
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+th,
+td,
+.data-table th,
+.data-table td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+th,
+.data-table th {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #6b7280;
+    background: #f9fafb;
+}
+
+/* Form and filters */
+.filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+input,
+select,
+textarea {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Stats cards */
+.stats,
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.stat,
+.stat-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.stat .v,
+.stat-card .stat-value {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.stat .k,
+.stat-card .stat-label {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* Status tabs and pagination */
+.status-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.status-tabs a {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    text-decoration: none;
+    color: #4b5563;
+    font-size: 13px;
+}
+
+.status-tabs a.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.pagination {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+.pagination a,
+.pagination span {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #111827;
+    font-size: 13px;
+}
+
+.pagination .active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+/* Badge mapping for both consoles */
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.b-active,
+.b-approved,
+.b-completed,
+.badge-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.b-pending,
+.b-paid,
+.b-shipped,
+.badge-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.b-rejected,
+.b-banned,
+.b-cancelled,
+.b-removed,
+.badge-removed,
+.badge-rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.b-draft,
+.badge-draft {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+    .main-header,
+    .header {
+        left: 0;
+    }
+    .main-content,
+    .content {
+        margin-left: 0;
+    }
+}
+
+/* ============================================================
+   Dashboard v2 — Stat cards / Quick actions / Welcome card
+   Added by dashboard refactor. Safe to remove this whole block
+   to revert to v1 appearance.
+   ============================================================ */
+
+/* Stat card container: soft shadow + rounded corners, with room on the left for an accent bar */
+.stat-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+}
+
+/* Lift-on-hover to hint that the card is a glance-at-a-metric surface */
+.stat-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* 3px left accent bar, absolute so it hugs the rounded corner regardless of padding */
+.stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--primary);
+}
+
+/* Accent color variants for the left bar — used via stat-accent-{name} modifier class */
+.stat-accent-slate::before  { background: #64748b; }
+.stat-accent-blue::before   { background: #3b82f6; }
+.stat-accent-orange::before { background: #f59e0b; }
+.stat-accent-green::before  { background: #10b981; }
+.stat-accent-purple::before { background: #8b5cf6; }
+.stat-accent-red::before    { background: #ef4444; }
+
+/* Small caption above the KPI number */
+.stat-card .stat-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+}
+
+/* The KPI itself — large, semibold, high-contrast */
+.stat-card .stat-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.2;
+}
+
+/* Rounded pill badge next to a Quick Action label (inherits button foreground color) */
+.qa-badge {
+    display: inline-block;
+    min-width: 18px;
+    padding: 0 6px;
+    margin-left: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.25);
+    color: inherit;
+    text-align: center;
+}
+
+/* Welcome card wraps a greeting + a short wish on a calm light surface */
+.welcome-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+}
+
+/* First line inside the welcome card — friendly greeting */
+.welcome-greeting {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 4px;
+}
+
+/* Second line inside the welcome card — soft italic wish */
+.welcome-wish {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-style: italic;
+}

@@ -1,0 +1,36 @@
+# Runtime secrets, identities, generated output and model assets never enter images.
+.git
+.env
+.env.*
+!.env.example
+.recshop-state
+**/.recshop-state
+.recshop-collection
+**/.recshop-collection
+.portable-check-*
+**/.portable-check-*
+.m1-runtime
+runs
+outputs
+local-assets
+deployment.local.json
+deployment-plan.json
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.log
+**/*.pkl
+**/*.pth
+**/*.inter
+**/*.item
+*.zip
+node_modules
+.venv
+venv
+tests
+docs
+# Service Dockerfiles copy only their service tree and shared/.
+
+# Local environment profiles and nested runtime identities
+**/*.local.json
+**/.m1-runtime

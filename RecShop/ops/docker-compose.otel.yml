@@ -1,0 +1,55 @@
+# Local observability stack. Keep management ports on a trusted network.
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.128.0
+    container_name: recweb2-otel-collector
+    command:
+    - --config=/etc/otel-config.yaml
+    volumes:
+    - ./otel-config.yaml:/etc/otel-config.yaml:ro
+    ports:
+    - 4317:4317
+    - 4318:4318
+    - 8889:8889
+    restart: unless-stopped
+  jaeger:
+    image: jaegertracing/all-in-one:1.76.0
+    container_name: recweb2-jaeger
+    environment:
+    - COLLECTOR_OTLP_ENABLED=true
+    ports:
+    - 16686:16686
+    restart: unless-stopped
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    container_name: recweb2-prometheus
+    volumes:
+    - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+    - 9090:9090
+    restart: unless-stopped
+  loki:
+    image: grafana/loki:3.5.3
+    container_name: recweb2-loki
+    command:
+    - -config.file=/etc/loki/loki-config.yaml
+    volumes:
+    - ./loki-config.yaml:/etc/loki/loki-config.yaml:ro
+    ports:
+    - 3100:3100
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:11.6.1
+    container_name: recweb2-grafana
+    environment:
+    - GF_AUTH_ANONYMOUS_ENABLED=false
+    - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+    - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+    - 3001:3000
+    depends_on:
+    - prometheus
+    - loki
+    - jaeger
+    restart: unless-stopped

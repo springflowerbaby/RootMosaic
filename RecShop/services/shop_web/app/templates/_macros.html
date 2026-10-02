@@ -1,0 +1,34 @@
+{#
+  Shared dashboard macros.
+  Keep each macro small and presentation-only — no business logic here.
+#}
+
+{# stat_card: KPI tile with a colored left accent bar.
+   label  = small caption above the value
+   value  = the metric itself (number or formatted string)
+   accent = left-bar color: slate|blue|orange|green|purple|red #}
+{% macro stat_card(label, value, accent='slate') %}
+  <div class="stat-card stat-accent-{{ accent }}">
+    <div class="stat-label">{{ label }}</div>
+    <div class="stat-value">{{ value }}</div>
+  </div>
+{% endmacro %}
+
+{# quick_action_button: a shortcut button for the Quick Actions card.
+   url     = link target
+   text    = button label
+   variant = visual style: primary|outline|warning|success
+   badge   = optional number; rendered only when truthy and > 0 #}
+{% macro quick_action_button(url, text, variant='outline', badge=None) %}
+  <a href="{{ url }}" class="btn btn-{{ variant }}">
+    {{ text }}{% if badge and badge > 0 %} <span class="qa-badge">{{ badge }}</span>{% endif %}
+  </a>
+{% endmacro %}
+
+{# welcome_card: friendly header card with a greeting line and a wish line. #}
+{% macro welcome_card(greeting, wish) %}
+  <div class="welcome-card">
+    <div class="welcome-greeting">{{ greeting }}</div>
+    <div class="welcome-wish">{{ wish }}</div>
+  </div>
+{% endmacro %}

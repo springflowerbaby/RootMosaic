@@ -1,0 +1,40 @@
+{% extends "admin/base.html" %}
+{% block title %}Order Management{% endblock %}
+{% block header_title %}Order Management{% endblock %}
+{% block content %}
+<h1 class="page-title">All Orders</h1>
+<form class="filters" method="get">
+    <select name="status">
+        <option value="">All Statuses</option>
+        {% for s in ['pending','paid','shipped','completed','cancelled'] %}
+        <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select>
+    <input name="q" placeholder="Search order number/user token" value="{{ q }}">
+    <button class="btn">Filter</button>
+</form>
+<div class="card table-wrap">
+<table>
+    <thead><tr><th>Order No.</th><th>User</th><th>Status</th><th>Amount</th><th>Created At</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for o in orders %}
+    <tr>
+        <td>{{ o.order_no }}</td>
+        <td>{{ o.user_token }}</td>
+        <td><span class="badge b-{{ o.status }}">{{ o.status }}</span></td>
+        <td>${{ "%.2f"|format(o.total_amount) }}</td>
+        <td>{{ o.created_at.strftime('%Y-%m-%d %H:%M') if o.created_at else '-' }}</td>
+        <td><a class="btn btn-sm" href="{{ url_for('admin.order_detail', order_no=o.order_no) }}">Details</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% if total_pages > 1 %}
+<div class="pagination">
+    {% for p in range(1, total_pages + 1) %}
+    <a class="{% if p == page %}active{% endif %}" href="{{ url_for('admin.orders', status=status, q=q, page=p) }}">{{ p }}</a>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

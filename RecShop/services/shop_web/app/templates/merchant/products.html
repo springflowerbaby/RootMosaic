@@ -1,0 +1,148 @@
+{% extends "merchant/base.html" %}
+
+{% block title %}Product Management{% endblock %}
+{% block header_title %}Product Management{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h1 class="page-title" style="margin-bottom: 0;">My Products</h1>
+    <a href="{{ url_for('merchant.product_new') }}" class="btn btn-primary">Create New Product</a>
+</div>
+
+<!-- Status tabs -->
+<div class="status-tabs">
+    <a href="{{ url_for('merchant.products', q=query) }}" class="{% if not status_filter %}active{% endif %}">
+        All ({{ status_counts.all }})
+    </a>
+    <a href="{{ url_for('merchant.products', status='active', q=query) }}" class="{% if status_filter == 'active' %}active{% endif %}">
+        Active ({{ status_counts.active }})
+    </a>
+    <a href="{{ url_for('merchant.products', status='draft', q=query) }}" class="{% if status_filter == 'draft' %}active{% endif %}">
+        Draft ({{ status_counts.draft }})
+    </a>
+    <a href="{{ url_for('merchant.products', status='pending', q=query) }}" class="{% if status_filter == 'pending' %}active{% endif %}">
+        Pending Review ({{ status_counts.pending }})
+    </a>
+    <a href="{{ url_for('merchant.products', status='removed', q=query) }}" class="{% if status_filter == 'removed' %}active{% endif %}">
+        Removed ({{ status_counts.removed }})
+    </a>
+</div>
+
+<!-- Search -->
+<div class="card" style="padding: .6rem 1rem;">
+    <form method="GET" action="{{ url_for('merchant.products') }}" style="display:flex;gap:.5rem;">
+        {% if status_filter %}
+        <input type="hidden" name="status" value="{{ status_filter }}">
+        {% endif %}
+        <input type="text" name="q" value="{{ query }}" placeholder="Search product title..." 
+               style="flex:1;padding:.5rem .8rem;border:1px solid #ddd;border-radius:6px;font-size:.9rem;outline:none;">
+        <button type="submit" class="btn btn-outline">Search</button>
+    </form>
+</div>
+
+<!-- Products table -->
+<div class="card" style="padding: 0; overflow-x: auto;">
+    {% if products %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Updated At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>
+                    <div style="display:flex;align-items:center;gap:.6rem;">
+                        <img src="{{ product.image_url or 'https://placehold.co/40x40/f5f5f5/999?text=N' }}" 
+                             alt="" style="width:40px;height:40px;object-fit:cover;border-radius:4px;">
+                        <div>
+                            <div style="font-weight:500;max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                {{ product.title or 'Untitled Product' }}
+                            </div>
+                            <div style="font-size:.75rem;color:#95a5a6;">ID: {{ product.item_id }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>{{ product.category or '-' }}</td>
+                <td>{% if product.price %}${{ "%.2f"|format(product.price) }}{% else %}-{% endif %}</td>
+                <td>
+                    <span class="badge badge-{{ product.status }}">
+                        {{ {'active':'Active','draft':'Draft','pending':'Pending Review','rejected':'Rejected','removed':'Removed'}[product.status] or product.status }}
+                    </span>
+                </td>
+                <td style="font-size:.85rem;color:#95a5a6;">
+                    {{ product.updated_at.strftime('%m-%d %H:%M') if product.updated_at else '-' }}
+                </td>
+                <td>
+                    <div style="display:flex;gap:.3rem;">
+                        {% if product.status != 'removed' %}
+                        <a href="{{ url_for('merchant.product_edit', product_id=product.id) }}" class="btn btn-outline btn-sm">Edit</a>
+                        {% if product.status in ['active','draft'] %}
+                        <button class="btn btn-outline btn-sm" onclick="toggleStatus({{ product.id }})">
+                            {{ 'Unpublish' if product.status == 'active' else 'Publish' }}
+                        </button>
+                        {% endif %}
+                        <button class="btn btn-danger btn-sm" onclick="deleteProduct({{ product.id }})">Delete</button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align:center;padding:3rem;color:#95a5a6;">
+        <p style="font-size:1rem;font-weight:600;">Products</p>
+        <p>No products yet</p>
+        <a href="{{ url_for('merchant.product_new') }}" class="btn btn-primary" style="margin-top:1rem;">Create your first product</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Pagination -->
+{% if total_pages > 1 %}
+<div class="pagination">
+    {% if page > 1 %}
+    <a href="{{ url_for('merchant.products', status=status_filter, q=query, page=page-1) }}">Previous</a>
+    {% endif %}
+    {% for p in range(1, total_pages + 1) %}
+    <a href="{{ url_for('merchant.products', status=status_filter, q=query, page=p) }}" 
+       class="{% if p == page %}active{% endif %}">{{ p }}</a>
+    {% endfor %}
+    {% if page < total_pages %}
+    <a href="{{ url_for('merchant.products', status=status_filter, q=query, page=page+1) }}">Next</a>
+    {% endif %}
+</div>
+{% endif %}
+
+<script>
+async function toggleStatus(productId) {
+    try {
+        const resp = await fetch(`/merchant/api/products/${productId}/toggle-status`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'}
+        });
+        const data = await resp.json();
+        if (data.success) { location.reload(); }
+        else { alert(data.message || 'Operation failed'); }
+    } catch (e) { alert('Network error'); }
+}
+
+async function deleteProduct(productId) {
+    if (!confirm('Are you sure you want to delete this product?')) return;
+    try {
+        const resp = await fetch(`/merchant/api/products/${productId}/delete`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'}
+        });
+        const data = await resp.json();
+        if (data.success) { location.reload(); }
+        else { alert(data.message || 'Delete failed'); }
+    } catch (e) { alert('Network error'); }
+}
+</script>
+{% endblock %}

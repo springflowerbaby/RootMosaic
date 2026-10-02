@@ -1,0 +1,65 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}Home - ShopWeb{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <h1>Discover the Beauty of Simple Living</h1>
+        <p>Curated quality products for your comfortable lifestyle</p>
+    </div>
+</section>
+
+<div class="container">
+    <h2 class="section-title">Recommended For You</h2>
+    <div class="product-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 4rem;">
+        {% for product in recommendations %}
+        <a href="{{ url_for('buyer.recommended_product_detail', product_id=product.id) }}" class="product-card">
+            <div class="product-image">
+                <img src="{{ product.image }}" alt="{{ product.name }}">
+            </div>
+            <div class="product-info">
+                <div class="product-category">{{ product.category }}</div>
+                <h3 class="product-name">{{ product.name }}</h3>
+                <div class="product-price">
+                    {% if product.price and product.price > 0 %}
+                        ${{ "%.2f"|format(product.price) }}
+                    {% else %}
+                        Price on Request
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="container" id="products">
+    <h2 class="section-title">Popular Products</h2>
+    
+    <div class="product-grid">
+        {% for product in products %}
+        <a href="{{ url_for('buyer.product_detail', product_id=product.id) }}" class="product-card">
+            <div class="product-image">
+                <img src="{{ product.image }}" alt="{{ product.name }}">
+            </div>
+            <div class="product-info">
+                <div class="product-category">{{ product.category }}</div>
+                <h3 class="product-name">{{ product.name }}</h3>
+                <div class="product-price">
+                    {% if product.price and product.price > 0 %}
+                        ${{ "%.2f"|format(product.price) }}
+                    {% else %}
+                        Price on Request
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,434 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}Checkout - ShopWeb{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/order.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="order-container container">
+    <h1 class="page-title">Checkout</h1>
+    
+    <div class="checkout-content">
+        <div class="checkout-left">
+            
+            <!-- Shipping Address -->
+            <div class="section-card">
+                <h2 class="section-title">Shipping Address</h2>
+                <div class="address-list" id="address-list">
+                    {% for addr in addresses %}
+                    <div class="address-card {% if addr.is_default %}selected{% endif %}" 
+                         data-address-id="{{ addr.id }}" onclick="selectAddress(this)">
+                        <div class="address-info">
+                            <div class="address-name-phone">
+                                {{ addr.receiver_name }} &nbsp; {{ addr.receiver_phone }}
+                                {% if addr.is_default %}
+                                <span class="address-default-badge">Default</span>
+                                {% endif %}
+                            </div>
+                            <div class="address-detail">{{ addr.full_address() }}</div>
+                        </div>
+                        <div class="address-actions">
+                            <button onclick="event.stopPropagation(); editAddress({{ addr.id }}, '{{ addr.receiver_name }}', '{{ addr.receiver_phone }}', '{{ addr.province or '' }}', '{{ addr.city or '' }}', '{{ addr.district or '' }}', '{{ addr.address }}')">Edit</button>
+                            <button onclick="event.stopPropagation(); deleteAddress({{ addr.id }})">Delete</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="btn-add-address" onclick="openAddressModal()">+ Add New Address</button>
+            </div>
+            
+            <!-- Order Items -->
+            <div class="section-card">
+                <h2 class="section-title">Order Items ({{ item_count }} items)</h2>
+                {% for ci in cart_items %}
+                <div class="checkout-item">
+                    <div class="checkout-item-image">
+                        <img src="{{ ci.item.image }}" alt="{{ ci.item.name }}">
+                    </div>
+                    <div class="checkout-item-info">
+                        <div class="checkout-item-name">{{ ci.item.name }}</div>
+                        <div class="checkout-item-qty">Qty: {{ ci.quantity }}</div>
+                    </div>
+                    <div class="checkout-item-price">${{ "%.2f"|format(ci.subtotal) }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Remark -->
+            <div class="section-card">
+                <h2 class="section-title">Order Remark</h2>
+                <textarea class="remark-input" id="order-remark" placeholder="Leave a note for the seller (optional)"></textarea>
+            </div>
+        </div>
+        
+        <!-- Summary Sidebar -->
+        <div class="checkout-summary">
+            <h2 class="section-title">Order Summary</h2>
+            <div class="summary-row">
+                <span>Items ({{ item_count }})</span>
+                <span>${{ "%.2f"|format(total_amount) }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span>Free</span>
+            </div>
+            <div class="summary-divider"></div>
+            <!-- Coupon / promotion code (frontend display only; real discount enforced by backend) -->
+            <div class="summary-row" style="gap:0.5rem;">
+                <input type="text" id="coupon-code-input" placeholder="Coupon code"
+                       style="flex:1; min-width:0; padding:0.4rem 0.5rem; border:1px solid #ddd; border-radius:4px;">
+                <button type="button" id="btn-apply-coupon" onclick="applyCoupon()"
+                        style="padding:0.4rem 0.9rem; border:1px solid #888; background:#f5f5f5; border-radius:4px; cursor:pointer; white-space:nowrap;">Apply</button>
+            </div>
+            <p id="coupon-message" style="margin:0.25rem 0 0; font-size:0.8rem; display:none;"></p>
+            <input type="hidden" id="applied-coupon-code" value="">
+            <div class="summary-row total">
+                <span>Total</span>
+                <span>${{ "%.2f"|format(total_amount) }}</span>
+            </div>
+            <button class="btn-submit-order" id="btn-submit-order" onclick="submitOrder()">
+                Place Order
+            </button>
+            <p style="text-align: center; margin-top: 0.75rem; font-size: 0.85rem; color: #999;">
+                By placing your order, you agree to our Terms of Service.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Address Modal -->
+<div class="address-modal-overlay" id="address-modal">
+    <div class="address-modal">
+        <h3 id="modal-title">Add New Address</h3>
+        <input type="hidden" id="edit-address-id" value="">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Receiver Name *</label>
+                <input type="text" id="addr-name" placeholder="Full name">
+            </div>
+            <div class="form-group">
+                <label>Phone *</label>
+                <input type="text" id="addr-phone" placeholder="Phone number">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Province</label>
+                <input type="text" id="addr-province" placeholder="Province/State">
+            </div>
+            <div class="form-group">
+                <label>City</label>
+                <input type="text" id="addr-city" placeholder="City">
+            </div>
+            <div class="form-group">
+                <label>District</label>
+                <input type="text" id="addr-district" placeholder="District">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Detailed Address *</label>
+            <textarea id="addr-detail" placeholder="Street, building, apartment, etc." rows="2"></textarea>
+        </div>
+        <div class="form-group" style="display:flex; align-items:center; gap:0.5rem;">
+            <input type="checkbox" id="addr-default">
+            <label for="addr-default" style="margin:0;">Set as default address</label>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-modal-cancel" onclick="closeAddressModal()">Cancel</button>
+            <button class="btn btn-modal-save" onclick="saveAddress()">Save Address</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedAddressId = null;
+
+// Auto-select default address on load
+document.addEventListener('DOMContentLoaded', function() {
+    const selected = document.querySelector('.address-card.selected');
+    if (selected) {
+        selectedAddressId = parseInt(selected.dataset.addressId);
+    }
+
+    // Progressive enhancement: checkout preview via checkout_service (cart/pricing/inventory fan-out).
+    // No params sent — user_token is injected from current_user on the backend.
+    // Failure (e.g. 503) is silently ignored so the Jinja-rendered page stays usable.
+    fetch('/api/checkout/preview')
+        .then(function(resp) {
+            if (!resp.ok) return null;
+            return resp.json();
+        })
+        .then(function(data) {
+            if (!data || !data.success) return;
+
+            // Out-of-stock guard: disable Place Order if inventory can't cover the cart.
+            if (data.all_available === false) {
+                const btn = document.getElementById('btn-submit-order');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = 'Out of Stock';
+                }
+                const summary = document.querySelector('.checkout-summary');
+                if (summary && !document.getElementById('preview-stock-warning')) {
+                    const warn = document.createElement('p');
+                    warn.id = 'preview-stock-warning';
+                    warn.style.cssText = 'text-align:center; margin-top:0.5rem; font-size:0.85rem; color:#d9534f;';
+                    warn.textContent = '部分商品库存不足';
+                    summary.appendChild(warn);
+                }
+            }
+
+            // Show tax-inclusive estimate alongside the existing Jinja amounts (does NOT overwrite them).
+            const summary = document.querySelector('.checkout-summary');
+            if (summary && typeof data.total === 'number' && !document.getElementById('preview-total-estimate')) {
+                const divider = summary.querySelector('.summary-divider');
+                const est = document.createElement('div');
+                est.id = 'preview-total-estimate';
+                est.className = 'summary-row';
+                est.style.color = '#666';
+                est.innerHTML = '<span>含税预估</span><span>$' + Number(data.total).toFixed(2) + '</span>';
+                if (divider) {
+                    summary.insertBefore(est, divider.nextSibling);
+                } else {
+                    summary.appendChild(est);
+                }
+            }
+        })
+        .catch(function() { /* preview unavailable — leave page as-is */ });
+});
+
+function selectAddress(el) {
+    document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedAddressId = parseInt(el.dataset.addressId);
+}
+
+function openAddressModal() {
+    document.getElementById('modal-title').textContent = 'Add New Address';
+    document.getElementById('edit-address-id').value = '';
+    document.getElementById('addr-name').value = '';
+    document.getElementById('addr-phone').value = '';
+    document.getElementById('addr-province').value = '';
+    document.getElementById('addr-city').value = '';
+    document.getElementById('addr-district').value = '';
+    document.getElementById('addr-detail').value = '';
+    document.getElementById('addr-default').checked = false;
+    document.getElementById('address-modal').classList.add('active');
+}
+
+function editAddress(id, name, phone, province, city, district, address) {
+    document.getElementById('modal-title').textContent = 'Edit Address';
+    document.getElementById('edit-address-id').value = id;
+    document.getElementById('addr-name').value = name;
+    document.getElementById('addr-phone').value = phone;
+    document.getElementById('addr-province').value = province;
+    document.getElementById('addr-city').value = city;
+    document.getElementById('addr-district').value = district;
+    document.getElementById('addr-detail').value = address;
+    document.getElementById('addr-default').checked = false;
+    document.getElementById('address-modal').classList.add('active');
+}
+
+function closeAddressModal() {
+    document.getElementById('address-modal').classList.remove('active');
+}
+
+async function saveAddress() {
+    const name = document.getElementById('addr-name').value.trim();
+    const phone = document.getElementById('addr-phone').value.trim();
+    const province = document.getElementById('addr-province').value.trim();
+    const city = document.getElementById('addr-city').value.trim();
+    const district = document.getElementById('addr-district').value.trim();
+    const address = document.getElementById('addr-detail').value.trim();
+    const isDefault = document.getElementById('addr-default').checked ? 1 : 0;
+    const addressId = document.getElementById('edit-address-id').value;
+    
+    if (!name || !phone || !address) {
+        alert('Please fill in name, phone and address.');
+        return;
+    }
+    
+    try {
+        const body = {
+            receiver_name: name,
+            receiver_phone: phone,
+            province: province,
+            city: city,
+            district: district,
+            address: address,
+            is_default: isDefault
+        };
+        if (addressId) body.address_id = parseInt(addressId);
+        
+        const resp = await fetch('/api/address/save', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        });
+        const data = await resp.json();
+        if (data.success) {
+            closeAddressModal();
+            location.reload();
+        } else {
+            alert(data.message || 'Failed to save address');
+        }
+    } catch (e) {
+        alert('Network error');
+    }
+}
+
+async function deleteAddress(id) {
+    if (!confirm('Delete this address?')) return;
+    try {
+        const resp = await fetch('/api/address/delete', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({address_id: id})
+        });
+        const data = await resp.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Failed to delete');
+        }
+    } catch (e) {
+        alert('Network error');
+    }
+}
+
+// Base order total rendered by Jinja (pre-coupon). Used to recompute the displayed discounted total.
+var COUPON_BASE_TOTAL = parseFloat('{{ "%.2f"|format(total_amount) }}');
+
+// Apply a coupon: validate via promotion_service proxy (same-origin, cookie session).
+// Valid -> show "Coupon -$X" + discounted total max(total-discount,0) and store code in hidden field.
+// Invalid -> show a non-blocking message; checkout is never blocked.
+function applyCoupon() {
+    var input = document.getElementById('coupon-code-input');
+    var msg = document.getElementById('coupon-message');
+    var hidden = document.getElementById('applied-coupon-code');
+    var code = (input.value || '').trim();
+    if (!code) {
+        showCouponMessage('请输入券码', false);
+        return;
+    }
+    var btn = document.getElementById('btn-apply-coupon');
+    btn.disabled = true;
+    fetch('/api/promotions/validate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'same-origin',
+        body: JSON.stringify({code: code})
+    })
+        .then(function(resp) {
+            if (!resp.ok) return null;
+            return resp.json();
+        })
+        .then(function(data) {
+            if (data && data.valid) {
+                var discount = Number(data.discount) || 0;
+                hidden.value = code;
+                renderCouponDiscount(discount);
+                showCouponMessage('已应用券码 ' + code, true);
+            } else {
+                hidden.value = '';
+                clearCouponDiscount();
+                showCouponMessage('券码无效或不可用', false);
+            }
+        })
+        .catch(function() {
+            showCouponMessage('券码校验暂不可用，请稍后再试', false);
+        })
+        .finally(function() { btn.disabled = false; });
+}
+
+function showCouponMessage(text, ok) {
+    var msg = document.getElementById('coupon-message');
+    if (!msg) return;
+    msg.textContent = text;
+    msg.style.color = ok ? '#28a745' : '#d9534f';
+    msg.style.display = 'block';
+}
+
+// Frontend-only display of the discount; real deduction is authoritative on the backend.
+function renderCouponDiscount(discount) {
+    var summary = document.querySelector('.checkout-summary');
+    if (!summary) return;
+    var totalRow = summary.querySelector('.summary-row.total');
+
+    // Coupon discount line (insert just before the Total row).
+    var line = document.getElementById('coupon-discount-row');
+    if (!line) {
+        line = document.createElement('div');
+        line.id = 'coupon-discount-row';
+        line.className = 'summary-row';
+        line.style.color = '#28a745';
+        if (totalRow) {
+            summary.insertBefore(line, totalRow);
+        } else {
+            summary.appendChild(line);
+        }
+    }
+    line.innerHTML = '<span>Coupon</span><span>-$' + discount.toFixed(2) + '</span>';
+
+    // Update the displayed total to max(base - discount, 0).
+    if (totalRow) {
+        var amountSpan = totalRow.querySelector('span:last-child');
+        if (amountSpan) {
+            var newTotal = Math.max(COUPON_BASE_TOTAL - discount, 0);
+            amountSpan.textContent = '$' + newTotal.toFixed(2);
+        }
+    }
+}
+
+function clearCouponDiscount() {
+    var line = document.getElementById('coupon-discount-row');
+    if (line) line.parentNode.removeChild(line);
+    var summary = document.querySelector('.checkout-summary');
+    if (!summary) return;
+    var totalRow = summary.querySelector('.summary-row.total');
+    if (totalRow) {
+        var amountSpan = totalRow.querySelector('span:last-child');
+        if (amountSpan) amountSpan.textContent = '$' + COUPON_BASE_TOTAL.toFixed(2);
+    }
+}
+
+async function submitOrder() {
+    if (!selectedAddressId) {
+        alert('Please select a shipping address.');
+        return;
+    }
+    
+    const btn = document.getElementById('btn-submit-order');
+    btn.disabled = true;
+    btn.textContent = 'Placing Order...';
+    
+    try {
+        const remark = document.getElementById('order-remark').value.trim();
+        const couponCode = document.getElementById('applied-coupon-code').value.trim();
+        const resp = await fetch('/api/order/create', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                address_id: selectedAddressId,
+                remark: remark,
+                coupon_code: couponCode
+            })
+        });
+        const data = await resp.json();
+        if (data.success) {
+            window.location.href = '/order/' + data.order_no;
+        } else {
+            alert(data.message || 'Failed to create order');
+            btn.disabled = false;
+            btn.textContent = 'Place Order';
+        }
+    } catch (e) {
+        alert('Network error');
+        btn.disabled = false;
+        btn.textContent = 'Place Order';
+    }
+}
+</script>
+{% endblock %}

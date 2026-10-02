@@ -1,0 +1,23 @@
+{% extends "merchant/base.html" %}
+{% block title %}Shop Settings{% endblock %}
+{% block header_title %}Shop Settings{% endblock %}
+{% block content %}
+<h1 class="page-title">Shop Information</h1>
+<div class="card">
+    <form method="POST">
+        <div class="form-group">
+            <label>Shop Name</label>
+            <input name="name" value="{{ shop.name or '' }}" required>
+        </div>
+        <div class="form-group">
+            <label>Shop Logo URL</label>
+            <input name="logo_url" value="{{ shop.logo_url or '' }}" placeholder="https://...">
+        </div>
+        <div class="form-group">
+            <label>Shop Description</label>
+            <textarea name="description">{{ shop.description or '' }}</textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Save</button>
+    </form>
+</div>
+{% endblock %}

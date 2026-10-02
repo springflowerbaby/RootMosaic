@@ -1,0 +1,229 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}{{ product.name }} - ShopWeb{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/product_detail.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="product-detail-container container">
+    <div class="product-gallery">
+        <div class="main-image">
+            <img src="{{ product.image }}" alt="{{ product.name }}">
+        </div>
+    </div>
+    
+    <div class="product-info-section">
+        <div class="product-header">
+            <span class="product-category">{{ product.category }}</span>
+            <h1 class="product-title">{{ product.name }}</h1>
+            <div class="product-rating">
+                <span class="stars">Rating {{ "%.1f"|format(product.rating if product.rating is not none else 0) }}/5</span>
+                <span class="rating-count">({{ product.review_count }} reviews)</span>
+            </div>
+        </div>
+        
+        <div class="product-price-section">
+            {% if product.price and product.price > 0 %}
+                <span class="currency">$</span>
+                <span class="price">{{ "%.2f"|format(product.price) }}</span>
+            {% else %}
+                <span class="price" style="font-size: 1.5rem;">Price on Request</span>
+            {% endif %}
+        </div>
+        
+        <div class="product-description">
+            <h3>Product Details</h3>
+            <p>{{ product.description }}</p>
+        </div>
+        
+        <div class="product-actions">
+            <div class="quantity-selector">
+                <button class="qty-btn minus">-</button>
+                <input type="number" value="1" min="1" max="99" class="qty-input">
+                <button class="qty-btn plus">+</button>
+            </div>
+            {% if current_user.is_authenticated %}
+                <button class="btn btn-primary add-to-cart">Add to Cart</button>
+                <button class="btn btn-outline buy-now">Buy Now</button>
+            {% else %}
+                <button class="btn btn-primary add-to-cart" onclick="window.location.href='{{ url_for('buyer.login', next=request.url) }}'">Add to Cart</button>
+                <button class="btn btn-outline buy-now" onclick="window.location.href='{{ url_for('buyer.login', next=request.url) }}'">Buy Now</button>
+            {% endif %}
+        </div>
+        
+        <div class="product-meta">
+            <div class="meta-item">
+                <span class="label">Brand:</span>
+                <span class="value">{{ product.brand }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="label">Product ID:</span>
+                <span class="value">{{ product.item_id }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="reviews-section container">
+    <h2 class="section-title">Customer Reviews</h2>
+    {% if review_stats.total > 0 %}
+    <div style="display:flex; align-items:center; gap:1.5rem; margin-bottom:1.2rem; padding:1rem; background:#f9fafb; border-radius:8px;">
+        <div style="text-align:center;">
+            <div style="font-size:2rem; font-weight:700; color:#1a1a1a;">{{ review_stats.avg_rating }}</div>
+            <div style="color:#f59e0b; font-size:1.1rem;">{% for i in range(review_stats.avg_rating|int) %}★{% endfor %}{% for i in range(5 - review_stats.avg_rating|int) %}☆{% endfor %}</div>
+            <div style="color:#999; font-size:0.85rem;">{{ review_stats.total }} review{{ 's' if review_stats.total != 1 else '' }}</div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="reviews-list" id="reviewsList">
+        {% for review in reviews %}
+        <div class="review-card">
+            <div class="review-header">
+                <div class="reviewer-info">
+                    <img src="{{ review.avatar }}" alt="{{ review.username }}" class="reviewer-avatar">
+                    <span class="reviewer-name">{{ review.username }}</span>
+                </div>
+                <span class="review-date">{{ review.date }}</span>
+            </div>
+            <div class="review-rating" style="color:#f59e0b;">{% for i in range(review.rating) %}★{% endfor %}{% for i in range(5 - review.rating) %}☆{% endfor %} {{ review.rating }}/5</div>
+            <div class="review-content">
+                <p>{{ review.content }}</p>
+                {% if review.images %}
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem;">
+                    {% for img in review.images %}
+                    <img src="{{ img }}" style="width:60px; height:60px; object-fit:cover; border-radius:4px; border:1px solid #eee;">
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% if review.reply %}
+            <div style="background:#f3f4f6; border-radius:6px; padding:0.6rem 0.8rem; margin-top:0.6rem; font-size:0.9rem;">
+                <strong style="color:#1a1a1a;">Merchant Reply:</strong>
+                <span style="color:#555;">{{ review.reply.content }}</span>
+                <span style="color:#aaa; font-size:0.8rem; margin-left:0.5rem;">{{ review.reply.date }}</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% if reviews|length == 0 %}
+    <p style="color:#999; text-align:center; padding:2rem 0;">No reviews yet. Be the first to review this product!</p>
+    {% endif %}
+    {% if review_stats.total > 10 %}
+    <div style="text-align:center; margin-top:1rem;">
+        <button id="loadMoreReviews" class="btn btn-outline" style="font-size:0.9rem;" onclick="loadMoreReviews()">Load More Reviews</button>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Load more reviews via AJAX
+    let reviewPage = 2;
+    async function loadMoreReviews() {
+        const btn = document.getElementById('loadMoreReviews');
+        btn.textContent = 'Loading...';
+        btn.disabled = true;
+        try {
+            const resp = await fetch(`/api/reviews/{{ product.item_id }}?page=${reviewPage}&per_page=10`);
+            const data = await resp.json();
+            if (data.success && data.reviews.length > 0) {
+                const list = document.getElementById('reviewsList');
+                data.reviews.forEach(r => {
+                    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+                    let html = `<div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <img src="${r.avatar}" alt="${r.username}" class="reviewer-avatar">
+                                <span class="reviewer-name">${r.username}</span>
+                            </div>
+                            <span class="review-date">${r.date}</span>
+                        </div>
+                        <div class="review-rating" style="color:#f59e0b;">${stars} ${r.rating}/5</div>
+                        <div class="review-content"><p>${r.content}</p></div>`;
+                    if (r.reply) {
+                        html += `<div style="background:#f3f4f6; border-radius:6px; padding:0.6rem 0.8rem; margin-top:0.6rem; font-size:0.9rem;">
+                            <strong style="color:#1a1a1a;">Merchant Reply:</strong>
+                            <span style="color:#555;">${r.reply.content}</span>
+                            <span style="color:#aaa; font-size:0.8rem; margin-left:0.5rem;">${r.reply.date}</span>
+                        </div>`;
+                    }
+                    html += `</div>`;
+                    list.insertAdjacentHTML('beforeend', html);
+                });
+                reviewPage++;
+                if (reviewPage > data.total_pages) {
+                    btn.style.display = 'none';
+                } else {
+                    btn.textContent = 'Load More Reviews';
+                    btn.disabled = false;
+                }
+            } else {
+                btn.style.display = 'none';
+            }
+        } catch (e) {
+            btn.textContent = 'Load More Reviews';
+            btn.disabled = false;
+        }
+    }
+
+    // Simple quantity increment/decrement logic
+    document.querySelector('.minus').addEventListener('click', function() {
+        var input = document.querySelector('.qty-input');
+        var value = parseInt(input.value);
+        if (value > 1) input.value = value - 1;
+    });
+    
+    document.querySelector('.plus').addEventListener('click', function() {
+        var input = document.querySelector('.qty-input');
+        var value = parseInt(input.value);
+        if (value < 99) input.value = value + 1;
+    });
+    
+    // Add to cart functionality
+    {% if current_user.is_authenticated %}
+    function doAddToCart(redirectToCheckout) {
+        const quantity = parseInt(document.querySelector('.qty-input').value);
+        const itemId = '{{ product.item_id }}';
+
+        fetch('/api/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ item_id: itemId, quantity: quantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (redirectToCheckout) {
+                    window.location.href = '{{ url_for("buyer.checkout") }}';
+                } else {
+                    alert('Added to cart successfully!');
+                    const cartBadge = document.querySelector('.cart-badge');
+                    if (cartBadge) {
+                        cartBadge.textContent = data.cart_count;
+                        cartBadge.style.display = 'inline-block';
+                    }
+                }
+            } else {
+                alert('Failed to add to cart: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to add to cart');
+        });
+    }
+
+    const addToCartBtn = document.querySelector('.add-to-cart');
+    if (addToCartBtn && !addToCartBtn.hasAttribute('onclick')) {
+        addToCartBtn.addEventListener('click', function() { doAddToCart(false); });
+    }
+
+    const buyNowBtn = document.querySelector('.buy-now');
+    if (buyNowBtn && !buyNowBtn.hasAttribute('onclick')) {
+        buyNowBtn.addEventListener('click', function() { doAddToCart(true); });
+    }
+    {% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,9 @@
+# Source template: configure namespace, images, database, assets and observability before use.
+# The portable business deployment entry renders the 25 application templates.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: recshop-example
+  labels:
+    app.kubernetes.io/part-of: recweb
+    recweb.io/stack: k8s-pilot

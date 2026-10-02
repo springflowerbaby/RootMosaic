@@ -1,0 +1,5 @@
+services:
+  m1-prometheus:
+    volumes:
+      - ./prometheus-container-resources.yml:/etc/prometheus/prometheus.yml:ro
+      - m1-prometheus-data:/prometheus

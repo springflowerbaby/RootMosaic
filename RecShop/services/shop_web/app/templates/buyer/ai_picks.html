@@ -1,0 +1,118 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}AI Picks - ShopWeb{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_picks.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="ai-picks-page">
+    <!-- Hero -->
+    <section class="ai-hero">
+        <div class="container">
+            <span class="ai-badge">Powered by LLM + SASRec</span>
+            <h1>AI Picks For You</h1>
+            <p>Our AI analyzes your browsing patterns and re-ranks recommendations to find the perfect match.</p>
+        </div>
+    </section>
+
+    <div class="container">
+        {% if error %}
+        <div class="ai-error">
+            <div class="error-icon">!</div>
+            <p>{{ error }}</p>
+            <a href="{{ url_for('buyer.index') }}" class="btn btn-sm">Browse Products</a>
+        </div>
+        {% elif ai_pick %}
+
+        <!-- AI Top Pick -->
+        <section class="ai-top-pick-section">
+            <h2 class="section-label">
+                AI Top Pick
+                {% if ai_source == 'llm' %}
+                <span class="source-tag tag-llm">LLM Reranked</span>
+                {% elif ai_source == 'fallback' %}
+                <span class="source-tag tag-fallback">Fallback</span>
+                {% else %}
+                <span class="source-tag tag-model">Model Pick</span>
+                {% endif %}
+            </h2>
+
+            <div class="top-pick-card">
+                <a href="{{ url_for('buyer.recommended_product_detail', product_id=ai_pick.id) }}" class="top-pick-image-link">
+                    <div class="top-pick-image">
+                        <img src="{{ ai_pick.image }}" alt="{{ ai_pick.name }}">
+                    </div>
+                </a>
+                <div class="top-pick-info">
+                    <div class="top-pick-category">{{ ai_pick.category }}</div>
+                    <h3 class="top-pick-name">
+                        <a href="{{ url_for('buyer.recommended_product_detail', product_id=ai_pick.id) }}">
+                            {{ ai_pick.name }}
+                        </a>
+                    </h3>
+                    {% if ai_pick.brand %}
+                    <div class="top-pick-brand">{{ ai_pick.brand }}</div>
+                    {% endif %}
+                    <div class="top-pick-price">
+                        {% if ai_pick.price and ai_pick.price > 0 %}
+                            <span class="currency">$</span>{{ "%.2f"|format(ai_pick.price) }}
+                        {% else %}
+                            Price on Request
+                        {% endif %}
+                    </div>
+
+                    {% if ai_reason %}
+                    <div class="ai-reason">
+                        <div class="reason-header">
+                            Reason: Why this item?
+                        </div>
+                        <p class="reason-text">{{ ai_reason }}</p>
+                    </div>
+                    {% endif %}
+
+                    <a href="{{ url_for('buyer.recommended_product_detail', product_id=ai_pick.id) }}" class="btn btn-primary">
+                        View Product
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other Candidates -->
+        {% if candidates|length > 1 %}
+        <section class="other-candidates-section">
+            <h2 class="section-label">
+                Other Recommended Items
+            </h2>
+
+            <div class="candidates-grid">
+                {% for c in candidates %}
+                {% if c.item_id != ai_pick.item_id %}
+                <a href="{{ url_for('buyer.recommended_product_detail', product_id=c.id) }}" class="candidate-card">
+                    <div class="candidate-rank">#{{ c.rank }}</div>
+                    <div class="candidate-image">
+                        <img src="{{ c.image }}" alt="{{ c.name }}">
+                    </div>
+                    <div class="candidate-info">
+                        <div class="candidate-category">{{ c.category }}</div>
+                        <h4 class="candidate-name">{{ c.name }}</h4>
+                        <div class="candidate-price">
+                            {% if c.price and c.price > 0 %}
+                                ${{ "%.2f"|format(c.price) }}
+                            {% else %}
+                                Price on Request
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
