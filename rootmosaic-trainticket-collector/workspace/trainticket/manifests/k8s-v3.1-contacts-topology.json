@@ -1,0 +1,265 @@
+{
+  "schema_version": "multirca.topology.v1",
+  "topology_version": "k8s-v3.1-contacts",
+  "system": "trainticket",
+  "platform": "kubernetes",
+  "namespace": "trainticket",
+  "active_component_count": 21,
+  "business_or_ui_component_count": 12,
+  "database_component_count": 9,
+  "components": [
+    {
+      "name": "ts-ui-dashboard",
+      "kind": "ui",
+      "port": 8080,
+      "workload_probe": false,
+      "trace_expected": false
+    },
+    {
+      "name": "ts-travel-service",
+      "kind": "business",
+      "port": 12346,
+      "dependency": "ts-travel-mongo",
+      "workload_probe": true,
+      "trace_expected": true
+    },
+    {
+      "name": "ts-travel-mongo",
+      "kind": "database",
+      "port": 27017,
+      "workload_probe": false,
+      "trace_expected": false
+    },
+    {
+      "name": "ts-route-service",
+      "kind": "business",
+      "port": 11178,
+      "dependency": "ts-route-mongo",
+      "workload_probe": true,
+      "trace_expected": true
+    },
+    {
+      "name": "ts-route-mongo",
+      "kind": "database",
+      "port": 27017,
+      "workload_probe": false,
+      "trace_expected": false
+    },
+    {
+      "name": "ts-station-service",
+      "kind": "business",
+      "port": 12345,
+      "dependency": "ts-station-mongo",
+      "workload_probe": true,
+      "trace_expected": true
+    },
+    {
+      "name": "ts-station-mongo",
+      "kind": "database",
+      "port": 27017,
+      "workload_probe": false,
+      "trace_expected": false
+    },
+    {
+      "name": "ts-train-service",
+      "kind": "business",
+      "port": 14567,
+      "dependency": "ts-train-mongo",
+      "workload_probe": true,
+      "trace_expected": true
+    },
+    {
+      "name": "ts-train-mongo",
+      "kind": "database",
+      "port": 27017,
+      "workload_probe": false,
+      "trace_expected": false
+    },
+    {
+      "name": "ts-price-service",
+      "kind": "business",
+      "port": 16579,
+      "dependency": "ts-price-mongo",
+      "workload_probe": true,
+      "trace_expected": true
+    },
+    {
+      "name": "ts-price-mongo",
+      "kind": "database",
+      "port": 27017,
+      "workload_probe": false,
+      "trace_expected": false
+    },
+    {
+      "name": "ts-travel2-service",
+      "kind": "business",
+      "port": 16346,
+      "dependency": "ts-travel2-mongo",
+      "workload_probe": true,
+      "trace_expected": true
+    },
+    {
+      "name": "ts-travel2-mongo",
+      "kind": "database",
+      "port": 27017,
+      "workload_probe": false,
+      "trace_expected": false
+    },
+    {
+      "name": "ts-seat-service",
+      "kind": "business",
+      "port": 18898,
+      "workload_probe": true,
+      "trace_expected": true
+    },
+    {
+      "name": "ts-ticketinfo-service",
+      "kind": "business",
+      "port": 15681,
+      "workload_probe": true,
+      "trace_expected": true
+    },
+    {
+      "name": "ts-order-service",
+      "kind": "business",
+      "port": 12031,
+      "dependency": "ts-order-mongo",
+      "workload_probe": true,
+      "trace_expected": true
+    },
+    {
+      "name": "ts-order-mongo",
+      "kind": "database",
+      "port": 27017,
+      "workload_probe": false,
+      "trace_expected": false
+    },
+    {
+      "name": "ts-order-other-service",
+      "kind": "business",
+      "port": 12032,
+      "dependency": "ts-order-other-mongo",
+      "workload_probe": true,
+      "trace_expected": true
+    },
+    {
+      "name": "ts-order-other-mongo",
+      "kind": "database",
+      "port": 27017,
+      "workload_probe": false,
+      "trace_expected": false
+    },
+    {
+      "name": "ts-contacts-service",
+      "kind": "business",
+      "port": 12347,
+      "dependency": "ts-contacts-mongo",
+      "workload_probe": true,
+      "trace_expected": true,
+      "auth": "trainticket_jwt_role_user"
+    },
+    {
+      "name": "ts-contacts-mongo",
+      "kind": "database",
+      "port": 27017,
+      "workload_probe": false,
+      "trace_expected": false
+    }
+  ],
+  "workload_probes": [
+    {
+      "name": "travel",
+      "service": "ts-travel-service",
+      "method": "GET",
+      "url": "http://ts-travel-service:12346/api/v1/travelservice/welcome",
+      "auth": null
+    },
+    {
+      "name": "route",
+      "service": "ts-route-service",
+      "method": "GET",
+      "url": "http://ts-route-service:11178/api/v1/routeservice/routes",
+      "auth": null
+    },
+    {
+      "name": "station",
+      "service": "ts-station-service",
+      "method": "GET",
+      "url": "http://ts-station-service:12345/api/v1/stationservice/stations",
+      "auth": null
+    },
+    {
+      "name": "train",
+      "service": "ts-train-service",
+      "method": "GET",
+      "url": "http://ts-train-service:14567/api/v1/trainservice/trains",
+      "auth": null
+    },
+    {
+      "name": "price",
+      "service": "ts-price-service",
+      "method": "GET",
+      "url": "http://ts-price-service:16579/api/v1/priceservice/prices/welcome",
+      "auth": null
+    },
+    {
+      "name": "travel2",
+      "service": "ts-travel2-service",
+      "method": "GET",
+      "url": "http://ts-travel2-service:16346/api/v1/travel2service/trips",
+      "auth": null
+    },
+    {
+      "name": "seat",
+      "service": "ts-seat-service",
+      "method": "GET",
+      "url": "http://ts-seat-service:18898/api/v1/seatservice/welcome",
+      "auth": null
+    },
+    {
+      "name": "ticketinfo",
+      "service": "ts-ticketinfo-service",
+      "method": "GET",
+      "url": "http://ts-ticketinfo-service:15681/api/v1/ticketinfoservice/welcome",
+      "auth": null
+    },
+    {
+      "name": "order",
+      "service": "ts-order-service",
+      "method": "GET",
+      "url": "http://ts-order-service:12031/api/v1/orderservice/order",
+      "auth": null
+    },
+    {
+      "name": "order-other",
+      "service": "ts-order-other-service",
+      "method": "GET",
+      "url": "http://ts-order-other-service:12032/api/v1/orderOtherService/orderOther",
+      "auth": null
+    },
+    {
+      "name": "contacts",
+      "service": "ts-contacts-service",
+      "method": "GET",
+      "url": "http://ts-contacts-service:12347/api/v1/contactservice/contacts",
+      "auth": "trainticket_jwt_role_user"
+    }
+  ],
+  "auth_profiles": {
+    "trainticket_jwt_role_user": {
+      "type": "jwt_hs256",
+      "subject": "fdse_microservice",
+      "roles": [
+        "ROLE_USER"
+      ],
+      "id": "4d2a46c7-71cb-4cf1-b5bb-b68406d9da6f",
+      "secret_env": "TRAINTICKET_JWT_SECRET"
+    }
+  },
+  "observability": {
+    "prometheus_scope": "kube-state-metrics + kubelet/cadvisor infrastructure metrics",
+    "business_metrics_endpoint_status": "403 unless separately authenticated/opened",
+    "trace_backend": "jaeger-query",
+    "logs_source": "kubectl logs per deployment"
+  }
+}

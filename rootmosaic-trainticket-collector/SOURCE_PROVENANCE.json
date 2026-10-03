@@ -1,0 +1,50 @@
+{
+  "sources": [
+    {
+      "source": "workspace/trainticket/scripts/collect-v3-expanded-baseline.ps1",
+      "source_sha256": "718f85cb75564b6235209d2a07f9d71d05048460d7446f057cabfbbef1e8983b"
+    },
+    {
+      "source": "workspace/trainticket/scripts/rebuild-v3-main-mr1-replicates.ps1",
+      "source_sha256": "703ffa5db71203c442dafe0ea959dec08213a5de08122a3e3a7ca1efa644c54f"
+    },
+    {
+      "source": "workspace/trainticket/datasets/k8s-v3.1-main/_manifests/trainticket_mr1_rebuild_plan.json",
+      "source_sha256": "e4a454011bbe89d8fc8cf6536972eb84804180f42bdd7e03c5e00f9a60c43508"
+    },
+    {
+      "source": "workspace/trainticket/manifests/k8s-v3.1-contacts-topology.json",
+      "source_sha256": "3417aab1403bd98b4e7ea65a8803016d9aa3723473b3a0b1a62a31e81139ce21"
+    },
+    {
+      "source": "workspace/trainticket/datasets/k8s-v3.1-main/_manifests/run_trainticket_root_signal_audit.py",
+      "source_sha256": "3176781bb1fff173b01fca145e4ae5a4a7db98cb41e04f033ca6224163cea75d"
+    },
+    {
+      "source": "workspace/trainticket/k8s/train-ticket-jaeger/ts-deployment-part1.yml",
+      "source_sha256": "13b33e12fe93fbe2273fcc3275b8009822795954be1e3540ac5b37fadc85edd1"
+    },
+    {
+      "source": "workspace/trainticket/k8s/train-ticket-jaeger/ts-deployment-part2.yml",
+      "source_sha256": "3061752ee3d8c4a96e15044d543920106e63b516d29ac087c2b6491aa7d02a75"
+    },
+    {
+      "source": "workspace/trainticket/k8s/train-ticket-jaeger/ts-deployment-part3.yml",
+      "source_sha256": "d4d323c882117754e4649b437653c29aae811f404e8245b620bd55368494e1ce"
+    },
+    {
+      "source": "workspace/trainticket/k8s/monitoring/k8s-rca-observability.yaml",
+      "source_sha256": "a0e030dcebfc1c2b7290c7892eb141f7203ec3ec84e1e36333ca0b00bd41ffd4"
+    },
+    {
+      "source": "vendor/train-ticket/LICENSE",
+      "source_sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6"
+    }
+  ],
+  "notes": [
+    "The collector and quality thresholds are retained from the v3.1 collection workflow.",
+    "Packaging changes: environment-based JWT key; input guards; independent plan/audit paths; non-destructive initialization; plan-only mode does not write outputs.",
+    "Deployment manifests are filtered to the 21 topology components plus Jaeger, retaining source resource limits and image tags; imagePullPolicy is IfNotPresent.",
+    "The historical plan is included, not the final curated dataset labels or telemetry."
+  ]
+}

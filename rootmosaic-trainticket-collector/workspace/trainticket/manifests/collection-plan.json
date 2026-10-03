@@ -1,0 +1,1812 @@
+{
+  "schema_version": "trainticket-mr1-rebuild-plan.v1",
+  "dataset_id": "k8s-v3.1-main",
+  "system": "trainticket",
+  "replicates_per_scenario": 5,
+  "scenario_count": 55,
+  "target_run_count": 275,
+  "source": "generated from current TrainTicket slot-once metadata before legacy archival",
+  "scenarios": [
+    {
+      "slot_id": "B01",
+      "scenario_key": "B01",
+      "split": "baselines",
+      "root_count": 0,
+      "scenario_name": "expanded no-fault baseline 01",
+      "root_components": [],
+      "fault_types": [],
+      "composition_type": "no_fault",
+      "interaction_pattern": "no_injection",
+      "fault_plan": []
+    },
+    {
+      "slot_id": "B02",
+      "scenario_key": "B02",
+      "split": "baselines",
+      "root_count": 0,
+      "scenario_name": "expanded no-fault baseline 02",
+      "root_components": [],
+      "fault_types": [],
+      "composition_type": "no_fault",
+      "interaction_pattern": "no_injection",
+      "fault_plan": []
+    },
+    {
+      "slot_id": "B03",
+      "scenario_key": "B03",
+      "split": "baselines",
+      "root_count": 0,
+      "scenario_name": "expanded no-fault baseline 03",
+      "root_components": [],
+      "fault_types": [],
+      "composition_type": "no_fault",
+      "interaction_pattern": "no_injection",
+      "fault_plan": []
+    },
+    {
+      "slot_id": "B04",
+      "scenario_key": "B04",
+      "split": "baselines",
+      "root_count": 0,
+      "scenario_name": "expanded no-fault baseline 04",
+      "root_components": [],
+      "fault_types": [],
+      "composition_type": "no_fault",
+      "interaction_pattern": "no_injection",
+      "fault_plan": []
+    },
+    {
+      "slot_id": "B05",
+      "scenario_key": "B05",
+      "split": "baselines",
+      "root_count": 0,
+      "scenario_name": "expanded no-fault baseline 05",
+      "root_components": [],
+      "fault_types": [],
+      "composition_type": "no_fault",
+      "interaction_pattern": "no_injection",
+      "fault_plan": []
+    },
+    {
+      "slot_id": "S01",
+      "scenario_key": "S01",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "UI proxy timeout too short",
+      "root_components": [
+        "ts-ui-dashboard"
+      ],
+      "fault_types": [
+        "timeout_misconfiguration"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-ui-dashboard",
+          "mode": "nginx_timeout",
+          "class": "configuration",
+          "type": "timeout_misconfiguration",
+          "injection": "client_timeout_too_short",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S02",
+      "scenario_key": "S02",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "UI retry disabled",
+      "root_components": [
+        "ts-ui-dashboard"
+      ],
+      "fault_types": [
+        "retry_policy_misconfiguration"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-ui-dashboard",
+          "mode": "nginx_retry_disabled",
+          "class": "configuration",
+          "type": "retry_policy_misconfiguration",
+          "injection": "retry_disabled",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S03",
+      "scenario_key": "S03",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "travel service CPU saturation",
+      "root_components": [
+        "ts-travel-service"
+      ],
+      "fault_types": [
+        "cpu_saturation"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-travel-service",
+          "mode": "cpu",
+          "class": "resource",
+          "type": "cpu_saturation",
+          "injection": "cpu_saturation",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S04",
+      "scenario_key": "S04",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "route service network delay",
+      "root_components": [
+        "ts-route-service"
+      ],
+      "fault_types": [
+        "network_delay"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-route-service",
+          "mode": "network_delay",
+          "class": "network",
+          "type": "network_delay",
+          "injection": "link_latency_injection",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S05",
+      "scenario_key": "S05",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "station service packet loss",
+      "root_components": [
+        "ts-station-service"
+      ],
+      "fault_types": [
+        "packet_loss"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-station-service",
+          "mode": "packet_loss",
+          "class": "network",
+          "type": "packet_loss",
+          "injection": "packet_loss_injection",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S06",
+      "scenario_key": "S06",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "train service memory pressure",
+      "root_components": [
+        "ts-train-service"
+      ],
+      "fault_types": [
+        "memory_stress"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-train-service",
+          "mode": "memory",
+          "class": "resource",
+          "type": "memory_stress",
+          "injection": "memory_pressure",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S07",
+      "scenario_key": "S07",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "price service runtime pause",
+      "root_components": [
+        "ts-price-service"
+      ],
+      "fault_types": [
+        "runtime_latency"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-price-service",
+          "mode": "network_delay",
+          "class": "runtime",
+          "type": "runtime_latency",
+          "injection": "service_latency",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S08",
+      "scenario_key": "S08",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "travel2 service pod kill",
+      "root_components": [
+        "ts-travel2-service"
+      ],
+      "fault_types": [
+        "pod_failure"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-travel2-service",
+          "mode": "pod_kill",
+          "class": "lifecycle",
+          "type": "pod_failure",
+          "injection": "pod_kill",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S09",
+      "scenario_key": "S09",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "seat service CPU saturation",
+      "root_components": [
+        "ts-seat-service"
+      ],
+      "fault_types": [
+        "cpu_saturation"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-seat-service",
+          "mode": "cpu",
+          "class": "resource",
+          "type": "cpu_saturation",
+          "injection": "cpu_saturation",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S10",
+      "scenario_key": "S10",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "ticketinfo service memory pressure",
+      "root_components": [
+        "ts-ticketinfo-service"
+      ],
+      "fault_types": [
+        "memory_stress"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-ticketinfo-service",
+          "mode": "memory",
+          "class": "resource",
+          "type": "memory_stress",
+          "injection": "memory_pressure",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S11",
+      "scenario_key": "S11",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "order service restart",
+      "root_components": [
+        "ts-order-service"
+      ],
+      "fault_types": [
+        "service_restart"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-order-service",
+          "mode": "pod_kill",
+          "class": "lifecycle",
+          "type": "service_restart",
+          "injection": "pod_kill",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S12",
+      "scenario_key": "S12",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "order-other service network delay",
+      "root_components": [
+        "ts-order-other-service"
+      ],
+      "fault_types": [
+        "network_delay"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-order-other-service",
+          "mode": "network_delay",
+          "class": "network",
+          "type": "network_delay",
+          "injection": "link_latency_injection",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S13",
+      "scenario_key": "S13",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "contacts authenticated workload degradation",
+      "root_components": [
+        "ts-contacts-service"
+      ],
+      "fault_types": [
+        "auth_workload_degradation"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-contacts-service",
+          "mode": "network_delay",
+          "class": "auth",
+          "type": "auth_workload_degradation",
+          "injection": "contact_path_latency",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S14",
+      "scenario_key": "S14",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "travel Mongo unavailable",
+      "root_components": [
+        "ts-travel-mongo"
+      ],
+      "fault_types": [
+        "dependency_failure"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-travel-mongo",
+          "mode": "pod_failure",
+          "class": "dependency",
+          "type": "dependency_failure",
+          "injection": "database_unavailable",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S15",
+      "scenario_key": "S15",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "route Mongo latency",
+      "root_components": [
+        "ts-route-mongo"
+      ],
+      "fault_types": [
+        "dependency_delay"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-route-mongo",
+          "mode": "network_delay",
+          "class": "dependency",
+          "type": "dependency_delay",
+          "injection": "database_latency",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S16",
+      "scenario_key": "S16",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "station Mongo restart",
+      "root_components": [
+        "ts-station-mongo"
+      ],
+      "fault_types": [
+        "dependency_restart"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-station-mongo",
+          "mode": "pod_kill",
+          "class": "dependency",
+          "type": "dependency_restart",
+          "injection": "database_pod_restart",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S17",
+      "scenario_key": "S17",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "order Mongo latency",
+      "root_components": [
+        "ts-order-mongo"
+      ],
+      "fault_types": [
+        "dependency_delay"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-order-mongo",
+          "mode": "network_delay",
+          "class": "dependency",
+          "type": "dependency_delay",
+          "injection": "database_latency",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "S18",
+      "scenario_key": "S18",
+      "split": "single-root",
+      "root_count": 1,
+      "scenario_name": "contacts Mongo unavailable",
+      "root_components": [
+        "ts-contacts-mongo"
+      ],
+      "fault_types": [
+        "dependency_failure"
+      ],
+      "composition_type": "single",
+      "interaction_pattern": "single_root",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-contacts-mongo",
+          "mode": "pod_failure",
+          "class": "dependency",
+          "type": "dependency_failure",
+          "injection": "database_unavailable",
+          "role": "primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D01",
+      "scenario_key": "D01",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "route service plus own Mongo",
+      "root_components": [
+        "ts-route-service",
+        "ts-route-mongo"
+      ],
+      "fault_types": [
+        "network_delay",
+        "dependency_delay"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "service_plus_own_db",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-route-service",
+          "mode": "network_delay",
+          "class": "network",
+          "type": "network_delay",
+          "injection": "link_latency_injection",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-route-mongo",
+          "mode": "network_delay",
+          "class": "dependency",
+          "type": "dependency_delay",
+          "injection": "database_latency",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D02",
+      "scenario_key": "D02",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "station service plus own Mongo",
+      "root_components": [
+        "ts-station-service",
+        "ts-station-mongo"
+      ],
+      "fault_types": [
+        "packet_loss",
+        "dependency_restart"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "service_plus_own_db",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-station-service",
+          "mode": "packet_loss",
+          "class": "network",
+          "type": "packet_loss",
+          "injection": "packet_loss_injection",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-station-mongo",
+          "mode": "pod_kill",
+          "class": "dependency",
+          "type": "dependency_restart",
+          "injection": "database_pod_restart",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D03",
+      "scenario_key": "D03",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "train service plus own Mongo",
+      "root_components": [
+        "ts-train-service",
+        "ts-train-mongo"
+      ],
+      "fault_types": [
+        "memory_stress",
+        "dependency_delay"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "service_plus_own_db",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-train-service",
+          "mode": "memory",
+          "class": "resource",
+          "type": "memory_stress",
+          "injection": "memory_pressure",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-train-mongo",
+          "mode": "network_delay",
+          "class": "dependency",
+          "type": "dependency_delay",
+          "injection": "database_latency",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D04",
+      "scenario_key": "D04",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "price service plus own Mongo",
+      "root_components": [
+        "ts-price-service",
+        "ts-price-mongo"
+      ],
+      "fault_types": [
+        "runtime_latency",
+        "dependency_failure"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "service_plus_own_db",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-price-service",
+          "mode": "network_delay",
+          "class": "runtime",
+          "type": "runtime_latency",
+          "injection": "service_latency",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-price-mongo",
+          "mode": "pod_failure",
+          "class": "dependency",
+          "type": "dependency_failure",
+          "injection": "database_unavailable",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D05",
+      "scenario_key": "D05",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "travel2 service plus own Mongo",
+      "root_components": [
+        "ts-travel2-service",
+        "ts-travel2-mongo"
+      ],
+      "fault_types": [
+        "pod_failure",
+        "dependency_delay"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "service_plus_own_db",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-travel2-service",
+          "mode": "pod_kill",
+          "class": "lifecycle",
+          "type": "pod_failure",
+          "injection": "pod_kill",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-travel2-mongo",
+          "mode": "network_delay",
+          "class": "dependency",
+          "type": "dependency_delay",
+          "injection": "database_latency",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D06",
+      "scenario_key": "D06",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "order service plus own Mongo",
+      "root_components": [
+        "ts-order-service",
+        "ts-order-mongo"
+      ],
+      "fault_types": [
+        "service_restart",
+        "dependency_delay"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "service_plus_own_db",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-order-service",
+          "mode": "pod_kill",
+          "class": "lifecycle",
+          "type": "service_restart",
+          "injection": "pod_kill",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-order-mongo",
+          "mode": "network_delay",
+          "class": "dependency",
+          "type": "dependency_delay",
+          "injection": "database_latency",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D07",
+      "scenario_key": "D07",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "order-other service plus own Mongo",
+      "root_components": [
+        "ts-order-other-service",
+        "ts-order-other-mongo"
+      ],
+      "fault_types": [
+        "network_delay",
+        "dependency_failure"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "service_plus_own_db",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-order-other-service",
+          "mode": "network_delay",
+          "class": "network",
+          "type": "network_delay",
+          "injection": "link_latency_injection",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-order-other-mongo",
+          "mode": "pod_failure",
+          "class": "dependency",
+          "type": "dependency_failure",
+          "injection": "database_unavailable",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D08",
+      "scenario_key": "D08",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "contacts service plus own Mongo",
+      "root_components": [
+        "ts-contacts-service",
+        "ts-contacts-mongo"
+      ],
+      "fault_types": [
+        "auth_workload_degradation",
+        "dependency_failure"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "service_plus_own_db",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-contacts-service",
+          "mode": "network_delay",
+          "class": "auth",
+          "type": "auth_workload_degradation",
+          "injection": "contact_path_latency",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-contacts-mongo",
+          "mode": "pod_failure",
+          "class": "dependency",
+          "type": "dependency_failure",
+          "injection": "database_unavailable",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D09",
+      "scenario_key": "D09",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "travel service plus own Mongo",
+      "root_components": [
+        "ts-travel-service",
+        "ts-travel-mongo"
+      ],
+      "fault_types": [
+        "cpu_saturation",
+        "dependency_failure"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "service_plus_own_db",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-travel-service",
+          "mode": "cpu",
+          "class": "resource",
+          "type": "cpu_saturation",
+          "injection": "cpu_saturation",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-travel-mongo",
+          "mode": "pod_failure",
+          "class": "dependency",
+          "type": "dependency_failure",
+          "injection": "database_unavailable",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D10",
+      "scenario_key": "D10",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "seat plus ticketinfo same path",
+      "root_components": [
+        "ts-seat-service",
+        "ts-ticketinfo-service"
+      ],
+      "fault_types": [
+        "cpu_saturation",
+        "memory_stress"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "same_path_business_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-seat-service",
+          "mode": "cpu",
+          "class": "resource",
+          "type": "cpu_saturation",
+          "injection": "cpu_saturation",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-ticketinfo-service",
+          "mode": "memory",
+          "class": "resource",
+          "type": "memory_stress",
+          "injection": "memory_pressure",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D11",
+      "scenario_key": "D11",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "route plus station same path",
+      "root_components": [
+        "ts-route-service",
+        "ts-station-service"
+      ],
+      "fault_types": [
+        "network_delay",
+        "packet_loss"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "same_path_business_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-route-service",
+          "mode": "network_delay",
+          "class": "network",
+          "type": "network_delay",
+          "injection": "link_latency_injection",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-station-service",
+          "mode": "packet_loss",
+          "class": "network",
+          "type": "packet_loss",
+          "injection": "packet_loss_injection",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D12",
+      "scenario_key": "D12",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "station plus train same path",
+      "root_components": [
+        "ts-station-service",
+        "ts-train-service"
+      ],
+      "fault_types": [
+        "packet_loss",
+        "memory_stress"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "same_path_business_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-station-service",
+          "mode": "packet_loss",
+          "class": "network",
+          "type": "packet_loss",
+          "injection": "packet_loss_injection",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-train-service",
+          "mode": "memory",
+          "class": "resource",
+          "type": "memory_stress",
+          "injection": "memory_pressure",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D13",
+      "scenario_key": "D13",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "travel2 plus price same path",
+      "root_components": [
+        "ts-travel2-service",
+        "ts-price-service"
+      ],
+      "fault_types": [
+        "pod_failure",
+        "runtime_latency"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "same_path_business_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-travel2-service",
+          "mode": "pod_kill",
+          "class": "lifecycle",
+          "type": "pod_failure",
+          "injection": "pod_kill",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-price-service",
+          "mode": "network_delay",
+          "class": "runtime",
+          "type": "runtime_latency",
+          "injection": "service_latency",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D14",
+      "scenario_key": "D14",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "order plus seat same path",
+      "root_components": [
+        "ts-order-service",
+        "ts-seat-service"
+      ],
+      "fault_types": [
+        "service_restart",
+        "cpu_saturation"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "same_path_business_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-order-service",
+          "mode": "pod_kill",
+          "class": "lifecycle",
+          "type": "service_restart",
+          "injection": "pod_kill",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-seat-service",
+          "mode": "cpu",
+          "class": "resource",
+          "type": "cpu_saturation",
+          "injection": "cpu_saturation",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D15",
+      "scenario_key": "D15",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "route plus price cross path",
+      "root_components": [
+        "ts-route-service",
+        "ts-price-service"
+      ],
+      "fault_types": [
+        "network_delay",
+        "runtime_latency"
+      ],
+      "composition_type": "staggered",
+      "interaction_pattern": "cross_path_business_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-route-service",
+          "mode": "network_delay",
+          "class": "network",
+          "type": "network_delay",
+          "injection": "link_latency_injection",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-price-service",
+          "mode": "network_delay",
+          "class": "runtime",
+          "type": "runtime_latency",
+          "injection": "service_latency",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D16",
+      "scenario_key": "D16",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "train plus contacts cross path",
+      "root_components": [
+        "ts-train-service",
+        "ts-contacts-service"
+      ],
+      "fault_types": [
+        "memory_stress",
+        "auth_workload_degradation"
+      ],
+      "composition_type": "staggered",
+      "interaction_pattern": "cross_path_business_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-train-service",
+          "mode": "memory",
+          "class": "resource",
+          "type": "memory_stress",
+          "injection": "memory_pressure",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-contacts-service",
+          "mode": "network_delay",
+          "class": "auth",
+          "type": "auth_workload_degradation",
+          "injection": "contact_path_latency",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D17",
+      "scenario_key": "D17",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "travel2 plus order-other cross path",
+      "root_components": [
+        "ts-travel2-service",
+        "ts-order-other-service"
+      ],
+      "fault_types": [
+        "pod_failure",
+        "network_delay"
+      ],
+      "composition_type": "staggered",
+      "interaction_pattern": "cross_path_business_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-travel2-service",
+          "mode": "pod_kill",
+          "class": "lifecycle",
+          "type": "pod_failure",
+          "injection": "pod_kill",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-order-other-service",
+          "mode": "network_delay",
+          "class": "network",
+          "type": "network_delay",
+          "injection": "link_latency_injection",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D18",
+      "scenario_key": "D18",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "ticketinfo plus contacts cross path",
+      "root_components": [
+        "ts-ticketinfo-service",
+        "ts-contacts-service"
+      ],
+      "fault_types": [
+        "memory_stress",
+        "auth_workload_degradation"
+      ],
+      "composition_type": "staggered",
+      "interaction_pattern": "cross_path_business_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-ticketinfo-service",
+          "mode": "memory",
+          "class": "resource",
+          "type": "memory_stress",
+          "injection": "memory_pressure",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-contacts-service",
+          "mode": "network_delay",
+          "class": "auth",
+          "type": "auth_workload_degradation",
+          "injection": "contact_path_latency",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D19",
+      "scenario_key": "D19",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "UI timeout plus travel Mongo unavailable",
+      "root_components": [
+        "ts-ui-dashboard",
+        "ts-travel-mongo"
+      ],
+      "fault_types": [
+        "timeout_misconfiguration",
+        "dependency_failure"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "config_plus_dependency",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-ui-dashboard",
+          "mode": "nginx_timeout",
+          "class": "configuration",
+          "type": "timeout_misconfiguration",
+          "injection": "client_timeout_too_short",
+          "role": "co-primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-travel-mongo",
+          "mode": "pod_failure",
+          "class": "dependency",
+          "type": "dependency_failure",
+          "injection": "database_unavailable",
+          "role": "co-primary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D20",
+      "scenario_key": "D20",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "UI retry plus route Mongo latency",
+      "root_components": [
+        "ts-ui-dashboard",
+        "ts-route-mongo"
+      ],
+      "fault_types": [
+        "retry_policy_misconfiguration",
+        "dependency_delay"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "config_plus_dependency",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-ui-dashboard",
+          "mode": "nginx_retry_disabled",
+          "class": "configuration",
+          "type": "retry_policy_misconfiguration",
+          "injection": "retry_disabled",
+          "role": "primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-route-mongo",
+          "mode": "network_delay",
+          "class": "dependency",
+          "type": "dependency_delay",
+          "injection": "database_latency",
+          "role": "secondary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D21",
+      "scenario_key": "D21",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "UI timeout plus order Mongo latency",
+      "root_components": [
+        "ts-ui-dashboard",
+        "ts-order-mongo"
+      ],
+      "fault_types": [
+        "timeout_misconfiguration",
+        "dependency_delay"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "config_plus_dependency",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-ui-dashboard",
+          "mode": "nginx_timeout",
+          "class": "configuration",
+          "type": "timeout_misconfiguration",
+          "injection": "client_timeout_too_short",
+          "role": "primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-order-mongo",
+          "mode": "network_delay",
+          "class": "dependency",
+          "type": "dependency_delay",
+          "injection": "database_latency",
+          "role": "secondary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D22",
+      "scenario_key": "D22",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "contacts plus order downstream",
+      "root_components": [
+        "ts-contacts-service",
+        "ts-order-service"
+      ],
+      "fault_types": [
+        "auth_workload_degradation",
+        "service_restart"
+      ],
+      "composition_type": "staggered",
+      "interaction_pattern": "contacts_downstream",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-contacts-service",
+          "mode": "network_delay",
+          "class": "auth",
+          "type": "auth_workload_degradation",
+          "injection": "contact_path_latency",
+          "role": "primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-order-service",
+          "mode": "pod_kill",
+          "class": "lifecycle",
+          "type": "service_restart",
+          "injection": "pod_kill",
+          "role": "secondary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D23",
+      "scenario_key": "D23",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "contacts Mongo plus order-other downstream",
+      "root_components": [
+        "ts-contacts-mongo",
+        "ts-order-other-service"
+      ],
+      "fault_types": [
+        "dependency_failure",
+        "network_delay"
+      ],
+      "composition_type": "staggered",
+      "interaction_pattern": "contacts_downstream",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-contacts-mongo",
+          "mode": "pod_failure",
+          "class": "dependency",
+          "type": "dependency_failure",
+          "injection": "database_unavailable",
+          "role": "primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-order-other-service",
+          "mode": "network_delay",
+          "class": "network",
+          "type": "network_delay",
+          "injection": "link_latency_injection",
+          "role": "secondary"
+        }
+      ]
+    },
+    {
+      "slot_id": "D24",
+      "scenario_key": "D24",
+      "split": "double-root",
+      "root_count": 2,
+      "scenario_name": "contacts plus ticketinfo downstream",
+      "root_components": [
+        "ts-contacts-service",
+        "ts-ticketinfo-service"
+      ],
+      "fault_types": [
+        "auth_workload_degradation",
+        "memory_stress"
+      ],
+      "composition_type": "staggered",
+      "interaction_pattern": "contacts_downstream",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-contacts-service",
+          "mode": "network_delay",
+          "class": "auth",
+          "type": "auth_workload_degradation",
+          "injection": "contact_path_latency",
+          "role": "primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-ticketinfo-service",
+          "mode": "memory",
+          "class": "resource",
+          "type": "memory_stress",
+          "injection": "memory_pressure",
+          "role": "secondary"
+        }
+      ]
+    },
+    {
+      "slot_id": "T01",
+      "scenario_key": "T01",
+      "split": "triple-root",
+      "root_count": 3,
+      "scenario_name": "UI travel service travel Mongo chain",
+      "root_components": [
+        "ts-ui-dashboard",
+        "ts-travel-service",
+        "ts-travel-mongo"
+      ],
+      "fault_types": [
+        "timeout_misconfiguration",
+        "cpu_saturation",
+        "dependency_failure"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "trigger_amplifier_chain",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-ui-dashboard",
+          "mode": "nginx_timeout",
+          "class": "configuration",
+          "type": "timeout_misconfiguration",
+          "injection": "client_timeout_too_short",
+          "role": "trigger"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-travel-service",
+          "mode": "cpu",
+          "class": "resource",
+          "type": "cpu_saturation",
+          "injection": "cpu_stress",
+          "role": "amplifier"
+        },
+        {
+          "fault_instance_id": "F3",
+          "target": "ts-travel-mongo",
+          "mode": "pod_failure",
+          "class": "dependency",
+          "type": "dependency_failure",
+          "injection": "database_unavailable",
+          "role": "dependency"
+        }
+      ]
+    },
+    {
+      "slot_id": "T02",
+      "scenario_key": "T02",
+      "split": "triple-root",
+      "root_count": 3,
+      "scenario_name": "route station train business chain",
+      "root_components": [
+        "ts-route-service",
+        "ts-station-service",
+        "ts-train-service"
+      ],
+      "fault_types": [
+        "network_delay",
+        "packet_loss",
+        "memory_stress"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "same_path_triple_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-route-service",
+          "mode": "network_delay",
+          "class": "network",
+          "type": "network_delay",
+          "injection": "link_latency_injection",
+          "role": "primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-station-service",
+          "mode": "packet_loss",
+          "class": "network",
+          "type": "packet_loss",
+          "injection": "packet_loss_injection",
+          "role": "secondary"
+        },
+        {
+          "fault_instance_id": "F3",
+          "target": "ts-train-service",
+          "mode": "memory",
+          "class": "resource",
+          "type": "memory_stress",
+          "injection": "memory_pressure",
+          "role": "tertiary"
+        }
+      ]
+    },
+    {
+      "slot_id": "T03",
+      "scenario_key": "T03",
+      "split": "triple-root",
+      "root_count": 3,
+      "scenario_name": "price seat ticketinfo mixed business path",
+      "root_components": [
+        "ts-price-service",
+        "ts-seat-service",
+        "ts-ticketinfo-service"
+      ],
+      "fault_types": [
+        "runtime_latency",
+        "cpu_saturation",
+        "memory_stress"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "same_path_triple_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-price-service",
+          "mode": "network_delay",
+          "class": "runtime",
+          "type": "runtime_latency",
+          "injection": "service_latency",
+          "role": "primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-seat-service",
+          "mode": "cpu",
+          "class": "resource",
+          "type": "cpu_saturation",
+          "injection": "cpu_stress",
+          "role": "secondary"
+        },
+        {
+          "fault_instance_id": "F3",
+          "target": "ts-ticketinfo-service",
+          "mode": "memory",
+          "class": "resource",
+          "type": "memory_stress",
+          "injection": "memory_pressure",
+          "role": "tertiary"
+        }
+      ]
+    },
+    {
+      "slot_id": "T04",
+      "scenario_key": "T04",
+      "split": "triple-root",
+      "root_count": 3,
+      "scenario_name": "order order-Mongo seat",
+      "root_components": [
+        "ts-order-service",
+        "ts-order-mongo",
+        "ts-seat-service"
+      ],
+      "fault_types": [
+        "service_restart",
+        "dependency_delay",
+        "cpu_saturation"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "service_db_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-order-service",
+          "mode": "pod_kill",
+          "class": "lifecycle",
+          "type": "service_restart",
+          "injection": "pod_kill",
+          "role": "primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-order-mongo",
+          "mode": "network_delay",
+          "class": "dependency",
+          "type": "dependency_delay",
+          "injection": "database_latency",
+          "role": "secondary"
+        },
+        {
+          "fault_instance_id": "F3",
+          "target": "ts-seat-service",
+          "mode": "cpu",
+          "class": "resource",
+          "type": "cpu_saturation",
+          "injection": "cpu_stress",
+          "role": "tertiary"
+        }
+      ]
+    },
+    {
+      "slot_id": "T05",
+      "scenario_key": "T05",
+      "split": "triple-root",
+      "root_count": 3,
+      "scenario_name": "order-other order-other-Mongo ticketinfo",
+      "root_components": [
+        "ts-order-other-service",
+        "ts-order-other-mongo",
+        "ts-ticketinfo-service"
+      ],
+      "fault_types": [
+        "network_delay",
+        "dependency_failure",
+        "memory_stress"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "service_db_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-order-other-service",
+          "mode": "network_delay",
+          "class": "network",
+          "type": "network_delay",
+          "injection": "link_latency_injection",
+          "role": "primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-order-other-mongo",
+          "mode": "pod_failure",
+          "class": "dependency",
+          "type": "dependency_failure",
+          "injection": "database_unavailable",
+          "role": "secondary"
+        },
+        {
+          "fault_instance_id": "F3",
+          "target": "ts-ticketinfo-service",
+          "mode": "memory",
+          "class": "resource",
+          "type": "memory_stress",
+          "injection": "memory_pressure",
+          "role": "tertiary"
+        }
+      ]
+    },
+    {
+      "slot_id": "T06",
+      "scenario_key": "T06",
+      "split": "triple-root",
+      "root_count": 3,
+      "scenario_name": "contacts contacts-Mongo order",
+      "root_components": [
+        "ts-contacts-service",
+        "ts-contacts-mongo",
+        "ts-order-service"
+      ],
+      "fault_types": [
+        "auth_workload_degradation",
+        "dependency_failure",
+        "service_restart"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "contacts_service_db_downstream",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-contacts-service",
+          "mode": "network_delay",
+          "class": "auth",
+          "type": "auth_workload_degradation",
+          "injection": "contact_path_latency",
+          "role": "primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-contacts-mongo",
+          "mode": "pod_failure",
+          "class": "dependency",
+          "type": "dependency_failure",
+          "injection": "database_unavailable",
+          "role": "secondary"
+        },
+        {
+          "fault_instance_id": "F3",
+          "target": "ts-order-service",
+          "mode": "pod_kill",
+          "class": "lifecycle",
+          "type": "service_restart",
+          "injection": "pod_kill",
+          "role": "tertiary"
+        }
+      ]
+    },
+    {
+      "slot_id": "T07",
+      "scenario_key": "T07",
+      "split": "triple-root",
+      "root_count": 3,
+      "scenario_name": "travel2 travel2-Mongo price",
+      "root_components": [
+        "ts-travel2-service",
+        "ts-travel2-mongo",
+        "ts-price-service"
+      ],
+      "fault_types": [
+        "pod_failure",
+        "dependency_delay",
+        "runtime_latency"
+      ],
+      "composition_type": "partial_overlap",
+      "interaction_pattern": "service_db_business",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-travel2-service",
+          "mode": "pod_failure",
+          "class": "lifecycle",
+          "type": "pod_failure",
+          "injection": "service_unavailable",
+          "role": "primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-travel2-mongo",
+          "mode": "network_delay",
+          "class": "dependency",
+          "type": "dependency_delay",
+          "injection": "database_latency",
+          "role": "secondary"
+        },
+        {
+          "fault_instance_id": "F3",
+          "target": "ts-price-service",
+          "mode": "network_delay",
+          "class": "runtime",
+          "type": "runtime_latency",
+          "injection": "service_latency",
+          "role": "tertiary"
+        }
+      ]
+    },
+    {
+      "slot_id": "T08",
+      "scenario_key": "T08",
+      "split": "triple-root",
+      "root_count": 3,
+      "scenario_name": "route-Mongo price-Mongo contacts",
+      "root_components": [
+        "ts-route-mongo",
+        "ts-price-mongo",
+        "ts-contacts-service"
+      ],
+      "fault_types": [
+        "dependency_delay",
+        "dependency_failure",
+        "auth_workload_degradation"
+      ],
+      "composition_type": "staggered",
+      "interaction_pattern": "cross_dependency_contacts",
+      "fault_plan": [
+        {
+          "fault_instance_id": "F1",
+          "target": "ts-route-mongo",
+          "mode": "network_delay",
+          "class": "dependency",
+          "type": "dependency_delay",
+          "injection": "database_latency",
+          "role": "primary"
+        },
+        {
+          "fault_instance_id": "F2",
+          "target": "ts-price-mongo",
+          "mode": "pod_failure",
+          "class": "dependency",
+          "type": "dependency_failure",
+          "injection": "database_unavailable",
+          "role": "secondary"
+        },
+        {
+          "fault_instance_id": "F3",
+          "target": "ts-contacts-service",
+          "mode": "network_delay",
+          "class": "auth",
+          "type": "auth_workload_degradation",
+          "injection": "contact_path_latency",
+          "role": "tertiary"
+        }
+      ]
+    }
+  ],
+  "runtime_latency_implementation_note": "runtime_latency faults are implemented with network_delay against the target service because process-level STOP did not produce observable TrainTicket service impact in Kubernetes."
+}
