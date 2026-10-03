@@ -19,6 +19,7 @@ from source_paths import SourcePaths, guard_output, protected_sources
 from source_integrity import InputSnapshot, input_bytes, input_json, input_sha
 from trace_formats import _flatten_traces_jsonl
 from log_views import RULE as LOG_SOURCE_RULE, group_logs, log_bytes
+from design_labels import apply_labels, load_mapping, mapping_path
 from metric_views import (SERVICES, WideView, canonical_service, history_records,
                           iso, membership, record)
 
@@ -48,7 +49,8 @@ def sha(path):
 
 def code_sha():
     files=sorted(Path(__file__).parent.glob('*.py'))
-    return digest(''.join(p.name+sha(p) for p in files if not p.name.startswith('test')).encode())
+    return digest((''.join(p.name+sha(p) for p in files if not p.name.startswith('test'))
+                   +'design_labels.v1.json'+sha(mapping_path())).encode())
 
 
 def copy_source(src, dest, refs, base):
@@ -370,7 +372,10 @@ def generate_case_fields(c, contract, summary, ops, annotation, counts, trace_se
     entry={k:c[k] for k in ('design_version','scenario_id','round','attempt_id','run_id')}
     entry.update(condition_id=summary['condition_id'],sample_id=name,root_count=n,path=relative_path,
                  accepted=True,counts=counts,eval_columns=eval_info['n_cols'],eval_services=eval_info['services'],**state)
-    injection={'faults':faults,'component_fault_windows':cfw,'actual_operations':'raw/operations/operations_log.json',
+    design_mapping, design_mapping_sha = load_mapping()
+    meta, gt = apply_labels(meta, gt, annotation, design_mapping, design_mapping_sha)
+    injection={'faults':meta['faults'],'component_fault_windows':cfw,'actual_operations':'raw/operations/operations_log.json',
+               'annotation_provenance':meta['annotation_provenance'],
                'timing_semantics':meta['migration']['timing_semantics']}
     return {'metadata':meta,'groundtruth':gt,'injection':injection,'stage_windows':stage_windows,
             'acceptance':accepted,'entry':entry}
@@ -584,6 +589,7 @@ def main():
     ad=out/'adapter';ad.mkdir(exist_ok=True)
     for p in Path(__file__).parent.glob('*.py'):
         if not p.name.startswith('test'): shutil.copyfile(p,ad/p.name)
+    shutil.copyfile(mapping_path(), ad/'design_labels.v1.json')
     finalize_delivery(out)
     print(json.dumps({'state':'COMPLETE','count':len(by)}),flush=True)
 

@@ -1,0 +1,2359 @@
+{
+  "schema_version": "recshop-design-labels-v1",
+  "mapping_version": "1.1",
+  "annotation_basis": "design_assigned",
+  "empirical_interaction_certification": false,
+  "description": "Fixed-design path relationships, interaction intent and per-instance roles using existing strict255 label values. Match design version, scenario and complete instance signatures. Composition labels come from current planned windows; actual operation-window records remain separate.",
+  "rows": [
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D01",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "dependency_latency",
+          "target_component": "inventory"
+        },
+        "F2": {
+          "fault_type": "retry_policy_misconfiguration",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Inventory GET reads inventory directly; a separate pricing-via-gateway carrier exposes the retry configuration. Inventory GET does not call catalog. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D01",
+        "configs/collection/campaign_conditions.json#contrast-D01-D01",
+        "scripts/collection/scenario_definitions.py#D01",
+        "services/inventory_service/app.py#get_inventory"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D02",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "network_loss",
+          "target_component": "catalog-gw"
+        },
+        "F2": {
+          "fault_type": "db_table_lock",
+          "target_component": "mysql_items_lock"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Direct catalog requests and pricing-via-gateway requests converge on catalog/items; the DB lock affects both, while packet loss affects the gateway branch only. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D02",
+        "configs/collection/campaign_conditions.json#contrast-D02-D02",
+        "scripts/collection/scenario_definitions.py#D02"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D03",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "fault_masking",
+      "roles": {
+        "F1": "primary",
+        "F2": "secondary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "host_cpu_saturation",
+          "target_component": "host"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "catalog"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "The design-level path relationship follows the strict255 convention for this normalized fault composition. Auxiliary collection and bypass carriers do not redefine the design label. Interaction and roles are fixed-design intent, not observed causal certification.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D03",
+        "configs/collection/campaign_conditions.json#contrast-D03-D03",
+        "scripts/collection/scenario_definitions.py#D03",
+        "rq4-redesign design CATALOG.json: D03 legacy_interaction_label_for_reference_only (design reference, not empirical evidence)",
+        "strict255:design_path_convention_for_matching_fault_composition"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      },
+      "path_convention": "strict255_design_relationship_not_auxiliary_carrier_coverage"
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D04",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "catalog"
+        },
+        "F2": {
+          "fault_type": "service_unavailable",
+          "target_component": "user"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Catalog-through-gateway and user health are distinct HTTP carriers; shared infrastructure alone does not make them one request path. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D04",
+        "configs/collection/campaign_conditions.json#contrast-D04-D04",
+        "scripts/collection/scenario_definitions.py#D04"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D05",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "fault_masking",
+      "roles": {
+        "F1": "primary",
+        "F2": "secondary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "catalog"
+        },
+        "F2": {
+          "fault_type": "timeout_misconfiguration",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "The main catalog-via-gateway path contains the timeout and unavailable catalog; the catalog-direct bypass omits the timeout leg. Design intent: catalog is the dominant masking mechanism and the other instance is secondary; dominance is assigned by design, not measured. This is an explicit static inference for the redesigned catalog-outage/timeout pair: unavailability can hide additional timeout symptoms; it does not inherit the old same-entity D05 design.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D05",
+        "configs/collection/campaign_conditions.json#contrast-D05-D05",
+        "scripts/collection/scenario_definitions.py#D05"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D06",
+      "path_relation": "same_request_path",
+      "interaction_pattern": "trigger_amplifier",
+      "roles": {
+        "F1": "primary",
+        "F2": "amplifier"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "host_cpu_saturation",
+          "target_component": "host"
+        },
+        "F2": {
+          "fault_type": "timeout_misconfiguration",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "The design-level path relationship follows the strict255 convention for this normalized fault composition. Auxiliary collection and bypass carriers do not redefine the design label. Interaction and roles are fixed-design intent, not observed causal certification.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D06",
+        "configs/collection/campaign_conditions.json#contrast-D06-D06",
+        "scripts/collection/scenario_definitions.py#D06",
+        "rq4-redesign design CATALOG.json: D06 legacy_interaction_label_for_reference_only (design reference, not empirical evidence)",
+        "strict255:design_path_convention_for_matching_fault_composition"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      },
+      "path_convention": "strict255_design_relationship_not_auxiliary_carrier_coverage"
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D07",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "dependency_latency",
+          "target_component": "inventory"
+        },
+        "F2": {
+          "fault_type": "network_delay",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Inventory GET and pricing-via-gateway are separate HTTP carriers; inventory lookup does not invoke catalog. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D07",
+        "configs/collection/campaign_conditions.json#contrast-D07-D07",
+        "scripts/collection/scenario_definitions.py#D07",
+        "services/inventory_service/app.py#get_inventory"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D08",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "network_delay",
+          "target_component": "catalog-gw"
+        },
+        "F2": {
+          "fault_type": "service_unavailable",
+          "target_component": "user"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Pricing-via-gateway and user health are separate HTTP request paths. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D08",
+        "configs/collection/campaign_conditions.json#contrast-D08-D08",
+        "scripts/collection/scenario_definitions.py#D08"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D09",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "sasrec"
+        },
+        "F2": {
+          "fault_type": "network_delay",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "The retained parent workload probes pricing-via-gateway and SASRec inference independently; backend statistics are an additional observation stream. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D09",
+        "configs/collection/campaign_conditions.json#contrast-T06-D09",
+        "scripts/collection/scenario_definitions.py#D09"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D10",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "fault_masking",
+      "roles": {
+        "F1": "primary",
+        "F2": "secondary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "db_table_lock",
+          "target_component": "mysql_items_lock"
+        },
+        "F2": {
+          "fault_type": "network_delay",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "The DB items lock lies behind both direct catalog and pricing-via-gateway carriers; gateway delay is absent from the direct bypass. Design intent: mysql_items_lock is the dominant masking mechanism and the other instance is secondary; dominance is assigned by design, not measured.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D10",
+        "configs/collection/campaign_conditions.json#contrast-D10-D10",
+        "scripts/collection/scenario_definitions.py#D10",
+        "rq4-redesign design CATALOG.json: D10 legacy_interaction_label_for_reference_only (design reference, not empirical evidence)"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D11",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "dependency_latency",
+          "target_component": "inventory"
+        },
+        "F2": {
+          "fault_type": "runtime_exception",
+          "target_component": "catalog"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Catalog item requests expose the runtime exception while separate inventory GET requests expose inventory delay. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D11",
+        "configs/collection/campaign_conditions.json#contrast-D11-D11",
+        "scripts/collection/scenario_definitions.py#D11",
+        "services/inventory_service/app.py#get_inventory"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D12",
+      "path_relation": "same_request_path",
+      "interaction_pattern": "trigger_amplifier",
+      "roles": {
+        "F1": "primary",
+        "F2": "amplifier"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "dependency_latency",
+          "target_component": "catalog"
+        },
+        "F2": {
+          "fault_type": "timeout_misconfiguration",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "The design-level path relationship follows the strict255 convention for this normalized fault composition. Auxiliary collection and bypass carriers do not redefine the design label. Interaction and roles are fixed-design intent, not observed causal certification.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D12",
+        "configs/collection/campaign_conditions.json#contrast-D12-D12",
+        "scripts/collection/scenario_definitions.py#D12",
+        "rq4-redesign design CATALOG.json: D12 legacy_interaction_label_for_reference_only (design reference, not empirical evidence)",
+        "strict255:design_path_convention_for_matching_fault_composition"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      },
+      "path_convention": "strict255_design_relationship_not_auxiliary_carrier_coverage"
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D13",
+      "path_relation": "same_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "dependency_latency",
+          "target_component": "catalog"
+        },
+        "F2": {
+          "fault_type": "network_loss",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "The design-level path relationship follows the strict255 convention for this normalized fault composition. Auxiliary collection and bypass carriers do not redefine the design label. Interaction and roles are fixed-design intent, not observed causal certification.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D13",
+        "configs/collection/campaign_conditions.json#contrast-D13-D13",
+        "scripts/collection/scenario_definitions.py#D13",
+        "strict255:design_path_convention_for_matching_fault_composition"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      },
+      "path_convention": "strict255_design_relationship_not_auxiliary_carrier_coverage"
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D14",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "network_delay",
+          "target_component": "catalog-gw"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "catalog"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Main pricing-via-gateway and direct catalog bypass share CPU-stressed catalog, while network delay is gateway-specific. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D14",
+        "configs/collection/campaign_conditions.json#contrast-D14-D14",
+        "scripts/collection/scenario_definitions.py#D14"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D15",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "dependency_latency",
+          "target_component": "catalog"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "pricing"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Pricing item requests call the delayed catalog and experience local pricing CPU contention; direct catalog bypass omits pricing CPU contention. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D15",
+        "configs/collection/campaign_conditions.json#contrast-D15-D15",
+        "scripts/collection/scenario_definitions.py#D15"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D16",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "fault_masking",
+      "roles": {
+        "F1": "co_primary_masked",
+        "F2": "co_primary_masking"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "network_delay",
+          "target_component": "catalog-gw"
+        },
+        "F2": {
+          "fault_type": "service_unavailable",
+          "target_component": "catalog"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Both configured fault instances remain co-primary design roots. Catalog unavailability is the masking instance; gateway network delay is the masked instance. Preserve the strict255 co_primary_masking/co_primary_masked role distinction; no measured dominance or empirical masking certification is inferred.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D16",
+        "configs/collection/campaign_conditions.json#contrast-D16-D16",
+        "scripts/collection/scenario_definitions.py#D16",
+        "rq4-redesign design CATALOG.json: D16 legacy_interaction_label_for_reference_only (design reference, not empirical evidence)",
+        "strict255:DK19_cross_class_nested_masking_compound_podfail_x_netdelay"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D17",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "checkout"
+        },
+        "F2": {
+          "fault_type": "dependency_latency",
+          "target_component": "inventory"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "The frozen checkout health probe and inventory GET are distinct carriers; checkout health is not the checkout-preview orchestration path. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D17",
+        "configs/collection/campaign_conditions.json#contrast-D17-D17",
+        "scripts/collection/scenario_definitions.py#D17"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D18",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "cart"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "order"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Cart health and order-detail requests are independently addressed carriers. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D18",
+        "configs/collection/campaign_conditions.json#contrast-D18-D18",
+        "scripts/collection/scenario_definitions.py#D18"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D19",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "search"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "review-query"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Search and review-query use separate enriched requests with enrich=1, sharing downstream catalog but placing the two injected roots on separate branches. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D19",
+        "configs/collection/campaign_conditions.json#contrast-D19-D19",
+        "scripts/collection/scenario_definitions.py#D19",
+        "services/review_query_service/app.py#enrich"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D20",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "rec-agent"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "backend"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "The design-level path relationship follows the strict255 convention for this normalized fault composition. Auxiliary collection and bypass carriers do not redefine the design label. Interaction and roles are fixed-design intent, not observed causal certification.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D20",
+        "configs/collection/campaign_conditions.json#contrast-D20-D20",
+        "scripts/collection/scenario_definitions.py#D20",
+        "services/backend_api/app.py#get_model_stats",
+        "services/recommendation_agent/workflow.py#health_check",
+        "strict255:design_path_convention_for_matching_fault_composition"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      },
+      "path_convention": "strict255_design_relationship_not_auxiliary_carrier_coverage"
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D21",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "user"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "backend"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Backend model statistics and user health are independent request carriers; no user-service call is implied by the statistics endpoint. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D21",
+        "configs/collection/campaign_conditions.json#contrast-D21-D21",
+        "scripts/collection/scenario_definitions.py#D21",
+        "services/backend_api/app.py#get_model_stats"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D22",
+      "path_relation": "same_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "pricing"
+        },
+        "F2": {
+          "fault_type": "timeout_misconfiguration",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Both pricing CPU and gateway timeout lie on the pricing-via-gateway carrier. The catalog-direct bypass traverses neither injected root. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D22",
+        "configs/collection/campaign_conditions.json#contrast-D22-D22",
+        "scripts/collection/scenario_definitions.py#D22"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D23",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "cart"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "pricing"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Cart health and pricing item requests are separate carriers. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D23",
+        "configs/collection/campaign_conditions.json#contrast-D23-D23",
+        "scripts/collection/scenario_definitions.py#D23"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D24",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "cart"
+        },
+        "F2": {
+          "fault_type": "service_unavailable",
+          "target_component": "checkout"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Checkout health and cart health are separate carriers, not a composed checkout transaction. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D24",
+        "configs/collection/campaign_conditions.json#contrast-D24-D24",
+        "scripts/collection/scenario_definitions.py#D24"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D25",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "pricing"
+        },
+        "F2": {
+          "fault_type": "service_unavailable",
+          "target_component": "checkout"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Checkout health and pricing item requests are separate carriers. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D25",
+        "configs/collection/campaign_conditions.json#contrast-D25-D25",
+        "scripts/collection/scenario_definitions.py#D25"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D26",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "backend"
+        },
+        "F2": {
+          "fault_type": "network_delay",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "The parent workload separately probes backend model statistics and pricing-via-gateway; retained SASRec inference is an additional observation branch. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D26",
+        "configs/collection/campaign_conditions.json#contrast-T06-D26",
+        "scripts/collection/scenario_definitions.py#D26"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D27",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "backend"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "sasrec"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Backend model statistics and SASRec inference are separate parent-workload requests; the statistics endpoint does not request SASRec inference. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D27",
+        "configs/collection/campaign_conditions.json#contrast-T06-D27",
+        "scripts/collection/scenario_definitions.py#D27",
+        "services/backend_api/app.py#get_model_stats"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D28",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "network_delay",
+          "target_component": "rec-agent"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "sasrec"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Recommendation-agent health calls SASRec health; a separate direct SASRec inference carrier shares SASRec but omits the rec-agent network leg. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D28",
+        "configs/collection/campaign_conditions.json#contrast-D28-D28",
+        "scripts/collection/scenario_definitions.py#D28",
+        "services/recommendation_agent/workflow.py#health_check"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D29",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "network_delay",
+          "target_component": "rec-agent"
+        },
+        "F2": {
+          "fault_type": "service_unavailable",
+          "target_component": "catalog"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Catalog-via-gateway and recommendation-agent health are separate carriers; the health route calls SASRec, not catalog. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D29",
+        "configs/collection/campaign_conditions.json#contrast-D29-D29",
+        "scripts/collection/scenario_definitions.py#D29",
+        "services/recommendation_agent/workflow.py#health_check"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D30",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "sasrec"
+        },
+        "F2": {
+          "fault_type": "service_unavailable",
+          "target_component": "catalog"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Catalog-via-gateway and direct SASRec inference are separate carriers. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D30",
+        "configs/collection/campaign_conditions.json#contrast-D30-D30",
+        "scripts/collection/scenario_definitions.py#D30"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D31",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "catalog"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "review-query"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Review-query enrich=1 calls catalog; direct catalog item requests share catalog but omit the review-query CPU root. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D31",
+        "configs/collection/campaign_conditions.json#contrast-D31-D31",
+        "scripts/collection/scenario_definitions.py#D31",
+        "services/review_query_service/app.py#enrich"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D32",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "order"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "catalog"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "The order-detail carrier has no enrich=1 and is independent of the catalog carrier. A retained review-query enrichment stream does not add order to the catalog path. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D32",
+        "configs/collection/campaign_conditions.json#contrast-T08-D32",
+        "scripts/collection/scenario_definitions.py#D32",
+        "services/order_service/app.py#get_order_detail"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "D33",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "order"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "review-query"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Order detail without enrichment and enriched review-query are separate root-bearing carriers; a retained catalog observation stream does not connect order to review-query. Design intent: separately injected mechanisms are co-primary; no directed amplification or masking is asserted. independent_parallel is a static design assignment, not a claim of empirically demonstrated independence.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:D33",
+        "configs/collection/campaign_conditions.json#contrast-T08-D33",
+        "scripts/collection/scenario_definitions.py#D33",
+        "services/order_service/app.py#get_order_detail"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S01",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "network_delay",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S01",
+        "configs/collection/campaign_conditions.json#contrast-T06-S01",
+        "scripts/collection/scenario_definitions.py#S01"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S02",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "network_loss",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S02",
+        "configs/collection/campaign_conditions.json#contrast-D02-S02",
+        "scripts/collection/scenario_definitions.py#S02"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S03",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "catalog"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S03",
+        "configs/collection/campaign_conditions.json#contrast-D29-S03",
+        "scripts/collection/scenario_definitions.py#S03"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S04",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "catalog"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S04",
+        "configs/collection/campaign_conditions.json#contrast-D31-S04",
+        "scripts/collection/scenario_definitions.py#S04"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S05",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "host_cpu_saturation",
+          "target_component": "host"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S05",
+        "configs/collection/campaign_conditions.json#isolated-S05",
+        "scripts/collection/scenario_definitions.py#S05"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S06",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "db_table_lock",
+          "target_component": "mysql_items_lock"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S06",
+        "configs/collection/campaign_conditions.json#contrast-D02-S06",
+        "scripts/collection/scenario_definitions.py#S06"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S07",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "runtime_exception",
+          "target_component": "catalog"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S07",
+        "configs/collection/campaign_conditions.json#contrast-D11-S07",
+        "scripts/collection/scenario_definitions.py#S07"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S08",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "dependency_latency",
+          "target_component": "catalog"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S08",
+        "configs/collection/campaign_conditions.json#contrast-D12-S08",
+        "scripts/collection/scenario_definitions.py#S08"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S09",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "order"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S09",
+        "configs/collection/campaign_conditions.json#contrast-D18-S09",
+        "scripts/collection/scenario_definitions.py#S09"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S10",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "cart"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S10",
+        "configs/collection/campaign_conditions.json#contrast-D18-S10",
+        "scripts/collection/scenario_definitions.py#S10"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S11",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "review-query"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S11",
+        "configs/collection/campaign_conditions.json#contrast-D31-S11",
+        "scripts/collection/scenario_definitions.py#S11"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S12",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "backend"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S12",
+        "configs/collection/campaign_conditions.json#contrast-D20-S12",
+        "scripts/collection/scenario_definitions.py#S12"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S13",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "checkout"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S13",
+        "configs/collection/campaign_conditions.json#isolated-S13",
+        "scripts/collection/scenario_definitions.py#S13"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S14",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "order"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S14",
+        "configs/collection/campaign_conditions.json#contrast-T08-S14",
+        "scripts/collection/scenario_definitions.py#S14"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S15",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "cart"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S15",
+        "configs/collection/campaign_conditions.json#isolated-S15",
+        "scripts/collection/scenario_definitions.py#S15"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S16",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "review-query"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S16",
+        "configs/collection/campaign_conditions.json#isolated-S16",
+        "scripts/collection/scenario_definitions.py#S16"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S17",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "backend"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S17",
+        "configs/collection/campaign_conditions.json#isolated-S17",
+        "scripts/collection/scenario_definitions.py#S17"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S18",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "checkout"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S18",
+        "configs/collection/campaign_conditions.json#contrast-D25-S18",
+        "scripts/collection/scenario_definitions.py#S18"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S19",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "search"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S19",
+        "configs/collection/campaign_conditions.json#contrast-D19-S19",
+        "scripts/collection/scenario_definitions.py#S19"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S20",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "rec-agent"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S20",
+        "configs/collection/campaign_conditions.json#contrast-D20-S20",
+        "scripts/collection/scenario_definitions.py#S20"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S21",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "network_delay",
+          "target_component": "rec-agent"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S21",
+        "configs/collection/campaign_conditions.json#contrast-D29-S21",
+        "scripts/collection/scenario_definitions.py#S21"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S22",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "rec-agent"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S22",
+        "configs/collection/campaign_conditions.json#isolated-S22",
+        "scripts/collection/scenario_definitions.py#S22"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S23",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "retry_policy_misconfiguration",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S23",
+        "configs/collection/campaign_conditions.json#contrast-D01-S23",
+        "scripts/collection/scenario_definitions.py#S23"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S24",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "timeout_misconfiguration",
+          "target_component": "catalog-gw"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S24",
+        "configs/collection/campaign_conditions.json#contrast-D06-S24",
+        "scripts/collection/scenario_definitions.py#S24"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S25",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "dependency_latency",
+          "target_component": "inventory"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S25",
+        "configs/collection/campaign_conditions.json#contrast-D11-S25",
+        "scripts/collection/scenario_definitions.py#S25"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S26",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "user"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S26",
+        "configs/collection/campaign_conditions.json#contrast-D21-S26",
+        "scripts/collection/scenario_definitions.py#S26"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S27",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "sasrec"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S27",
+        "configs/collection/campaign_conditions.json#contrast-T06-S27",
+        "scripts/collection/scenario_definitions.py#S27"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "S28",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "pricing"
+        }
+      },
+      "assignment_status": "design_assigned",
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "empirical_interaction_verified": false,
+      "rationale": "Single injected root; no instance pair exists. The sole instance is assigned primary as a design label, not an observed dominance claim.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:S28",
+        "configs/collection/campaign_conditions.json#contrast-D25-S28",
+        "scripts/collection/scenario_definitions.py#S28"
+      ],
+      "signature_validation": {
+        "delivery_cases_checked": 5,
+        "all_repeats_match": true,
+        "frozen_condition_F_order_matches": true
+      }
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "T01",
+      "path_relation": "same_request_path",
+      "interaction_pattern": "trigger_amplifier",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary",
+        "F3": "amplifier"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "pricing"
+        },
+        "F2": {
+          "fault_type": "dependency_latency",
+          "target_component": "catalog"
+        },
+        "F3": {
+          "fault_type": "timeout_misconfiguration",
+          "target_component": "catalog-gw"
+        }
+      },
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "rationale": "The design-level path relationship follows the strict255 convention for this normalized fault composition. Auxiliary collection and bypass carriers do not redefine the design label. Interaction and roles are fixed-design intent, not observed causal certification.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:T01",
+        "configs/collection/campaign_conditions.json#contrast-T01-T01",
+        "scripts/collection/scenario_definitions.py#T01",
+        "services/pricing_service/app.py",
+        "scripts/collection/pricing_route.py",
+        "strict255:design_path_convention_for_matching_fault_composition"
+      ],
+      "path_convention": "strict255_design_relationship_not_auxiliary_carrier_coverage"
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "T05",
+      "path_relation": "same_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary",
+        "F3": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "checkout"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "cart"
+        },
+        "F3": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "pricing"
+        }
+      },
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "rationale": "The design-level path relationship follows the strict255 convention for this normalized fault composition. Auxiliary collection and bypass carriers do not redefine the design label. Interaction and roles are fixed-design intent, not observed causal certification.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:T05",
+        "configs/collection/campaign_conditions.json#contrast-T05-T05",
+        "scripts/collection/scenario_definitions.py#T05",
+        "services/checkout_service/app.py#health_check",
+        "services/cart_service/app.py#health_check",
+        "strict255:design_path_convention_for_matching_fault_composition"
+      ],
+      "path_convention": "strict255_design_relationship_not_auxiliary_carrier_coverage"
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "T06",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary",
+        "F3": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "backend"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "sasrec"
+        },
+        "F3": {
+          "fault_type": "network_delay",
+          "target_component": "catalog-gw"
+        }
+      },
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "rationale": "The design-level path relationship follows the strict255 convention for this normalized fault composition. Auxiliary collection and bypass carriers do not redefine the design label. Interaction and roles are fixed-design intent, not observed causal certification.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:T06",
+        "configs/collection/campaign_conditions.json#contrast-T06-T06",
+        "scripts/collection/scenario_definitions.py#T06",
+        "services/backend_api/app.py#/api/stats/model",
+        "services/sasrec_api/api_server.py#/recommend",
+        "strict255:design_path_convention_for_matching_fault_composition"
+      ],
+      "path_convention": "strict255_design_relationship_not_auxiliary_carrier_coverage"
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "T07",
+      "path_relation": "different_request_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary",
+        "F3": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "network_delay",
+          "target_component": "rec-agent"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "sasrec"
+        },
+        "F3": {
+          "fault_type": "service_unavailable",
+          "target_component": "catalog"
+        }
+      },
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "rationale": "The design-level path relationship follows the strict255 convention for this normalized fault composition. Auxiliary collection and bypass carriers do not redefine the design label. Interaction and roles are fixed-design intent, not observed causal certification.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:T07",
+        "configs/collection/campaign_conditions.json#contrast-T07-T07",
+        "scripts/collection/scenario_definitions.py#T07",
+        "services/recommendation_agent/workflow.py#health_check",
+        "services/sasrec_api/api_server.py#/recommend",
+        "strict255:design_path_convention_for_matching_fault_composition"
+      ],
+      "path_convention": "strict255_design_relationship_not_auxiliary_carrier_coverage"
+    },
+    {
+      "design_version": "rq4-composition-proposal-20260916-v1",
+      "scenario_id": "T08",
+      "path_relation": "partially_shared_path",
+      "interaction_pattern": "independent_parallel",
+      "roles": {
+        "F1": "co_primary",
+        "F2": "co_primary",
+        "F3": "co_primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "service_unavailable",
+          "target_component": "order"
+        },
+        "F2": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "review-query"
+        },
+        "F3": {
+          "fault_type": "service_cpu_saturation",
+          "target_component": "catalog"
+        }
+      },
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "rationale": "The frozen order-detail request does not set enrich and does not take its optional catalog-enrichment branch. The review-query carrier explicitly sets enrich=1 and calls catalog, which is also probed directly. Thus review-query/catalog share part of the carrier path while order is a separate path; equal roles reflect parallel design intent.",
+      "sources": [
+        "configs/collection/scenarios.json#rq4-composition-proposal-20260916-v1:T08",
+        "configs/collection/campaign_conditions.json#contrast-T08-T08",
+        "scripts/collection/scenario_definitions.py#T08",
+        "services/order_service/app.py#get_order",
+        "services/review_query_service/app.py#list_reviews"
+      ]
+    },
+    {
+      "design_version": "rq4-d06-15ms-incremental-20260929-v1",
+      "scenario_id": "D34",
+      "path_relation": "same_request_path",
+      "interaction_pattern": "trigger_amplifier",
+      "roles": {
+        "F1": "primary",
+        "F2": "amplifier"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "host_cpu_saturation",
+          "target_component": "host"
+        },
+        "F2": {
+          "fault_type": "timeout_misconfiguration",
+          "target_component": "catalog-gw"
+        }
+      },
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "rationale": "The design-level path relationship follows the strict255 convention for this normalized fault composition. Auxiliary collection and bypass carriers do not redefine the design label. Interaction and roles are fixed-design intent, not observed causal certification.",
+      "sources": [
+        "configs/collection/gateway_cpu_network_scenarios.json#rq4-d06-15ms-incremental-20260929-v1:D34",
+        "scripts/collection/gateway_cpu_network.py",
+        "strict255:design_path_convention_for_matching_fault_composition"
+      ],
+      "path_convention": "strict255_design_relationship_not_auxiliary_carrier_coverage"
+    },
+    {
+      "design_version": "rq4-d06-15ms-incremental-20260929-v1",
+      "scenario_id": "S29",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "host_cpu_saturation",
+          "target_component": "host"
+        }
+      },
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "rationale": "A-only member of the fixed A/B/AB family. The sole fault instance is host CPU saturation; the common pricing-via-gateway and direct-catalog routes are controlled observation conditions, not additional faults.",
+      "sources": [
+        "configs/collection/gateway_cpu_network_scenarios.json#rq4-d06-15ms-incremental-20260929-v1:S29",
+        "scripts/collection/gateway_cpu_network.py"
+      ]
+    },
+    {
+      "design_version": "rq4-d06-15ms-incremental-20260929-v1",
+      "scenario_id": "S30",
+      "path_relation": "single",
+      "interaction_pattern": "single_root",
+      "roles": {
+        "F1": "primary"
+      },
+      "fault_signatures": {
+        "F1": {
+          "fault_type": "timeout_misconfiguration",
+          "target_component": "catalog-gw"
+        }
+      },
+      "path_relation_status": "design_assigned",
+      "interaction_pattern_status": "design_assigned",
+      "roles_status": "design_assigned",
+      "rationale": "B-only member of the fixed A/B/AB family. The sole fault instance is the 15 ms gateway timeout. The idle host carrier is not CPU injection; shared observation routes do not make this a multi-root case.",
+      "sources": [
+        "configs/collection/gateway_cpu_network_scenarios.json#rq4-d06-15ms-incremental-20260929-v1:S30",
+        "scripts/collection/gateway_cpu_network.py"
+      ]
+    }
+  ],
+  "label_vocabulary": "strict255_existing_values_only"
+}

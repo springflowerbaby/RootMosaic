@@ -1,35 +1,27 @@
-<h1 align="center">RecShop</h1>
-
-<p align="center">RecShop 是面向微服务故障诊断研究的电商推荐平台。</p>
-
 <p align="center">
-  <a href="LICENSE.md"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-E11D48.svg?style=for-the-badge&amp;labelColor=334155"></a>
-  <a href="ENVIRONMENT.md"><img alt="Python 3.10" src="https://img.shields.io/badge/Python-3.10-B45309.svg?style=for-the-badge&amp;labelColor=334155"></a>
-  <a href="docs/DEPLOYMENT.md"><img alt="Deployment: Kubernetes" src="https://img.shields.io/badge/Deployment-Kubernetes-047857.svg?style=for-the-badge&amp;labelColor=334155"></a>
-  <a href="docs/COLLECTION-ENVIRONMENT.md"><img alt="Collection host: Windows" src="https://img.shields.io/badge/Collection%20host-Windows-7C3AED.svg?style=for-the-badge&amp;labelColor=334155"></a>
+  <img src="assets/readme/recshop-logo.png" alt="RecShop 标志" width="720">
 </p>
 
-<p align="center"><a href="README.md">English</a> · <strong>简体中文</strong></p>
+---
 
-<p align="center"><img src="assets/readme/rainbow-divider.svg" width="1000" height="6" alt=""></p>
+# RecShop
+
+*面向微服务故障诊断研究的电商推荐平台。*
+
+<p>
+  <a href="LICENSE.md"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-E11D48.svg?style=flat&amp;labelColor=334155"></a>
+  <a href="ENVIRONMENT.md"><img alt="Python 3.10" src="https://img.shields.io/badge/Python-3.10-B45309.svg?style=flat&amp;labelColor=334155"></a>
+  <a href="docs/DEPLOYMENT.md"><img alt="Deployment: Kubernetes" src="https://img.shields.io/badge/Deployment-Kubernetes-047857.svg?style=flat&amp;labelColor=334155"></a>
+  <a href="docs/COLLECTION-ENVIRONMENT.md"><img alt="Collection host: Windows" src="https://img.shields.io/badge/Collection%20host-Windows-7C3AED.svg?style=flat&amp;labelColor=334155"></a>
+</p>
+
+[快速开始](#快速开始) | [采集指南](docs/COLLECTION.md) | [数据集指南](docs/DATA-MIGRATION.md) | [English](README.md)
 
 平台包含 25 个应用服务：24 个 Flask 服务和 1 个 FastAPI SASRec 推理服务。多数业务服务共享 MySQL；推荐工作流、模型服务和 LLM 重排是真实业务功能，不是故障采集控制器。内部模块、镜像和服务标识保留兼容名称。
 
-## 系统架构
+<a href="assets/figures/recshop-system-overview.png"><img src="assets/figures/recshop-system-overview.png" alt="RecShop 系统概览" width="1000"></a>
 
-### 系统概览
-
-<img src="assets/figures/recshop-system-overview.png" alt="RecShop 系统概览" width="1000">
-
-[查看原尺寸系统架构图](assets/figures/recshop-system-overview.png)
-
-### 服务依赖
-
-<img src="assets/figures/recshop-service-dependencies.png" alt="RecShop 服务依赖图" width="1000">
-
-[查看原尺寸服务依赖图](assets/figures/recshop-service-dependencies.png)
-
-### 服务分组
+<a href="assets/figures/recshop-service-dependencies.png"><img src="assets/figures/recshop-service-dependencies.png" alt="RecShop 服务依赖图" width="1000"></a>
 
 下表汇总 25 个应用服务。服务职责、端口与业务边界见[完整服务说明](services/README.md)。
 
@@ -72,6 +64,21 @@
 
 复制 `.env.example` 为本地 `.env`，提供自己的数据库、会话密钥及可选 LLM 配置。模型权重、RecBole 缓存和商品文件不随代码提供，来源、配套关系及已知文件校验值见[资产与环境](ENVIRONMENT.md)。业务 API 面向可信内网；不要将管理和数据接口无隔离地公开暴露。
 
+#### 下载复现资产
+
+[从 Google Drive 下载复现资产包](https://drive.google.com/drive/folders/1oXmQEjIg4rRb9ivikw2tkI93fmr9AnCc?usp=sharing)。下载 `RecShop-reproduction-20261003.zip`（约 2.32 GiB），内含以下外部文件：
+
+| 包内文件 | 内容与用途 |
+|---|---|
+| `model-assets/SASRec-Feb-24-2026_17-54-22.pth` | 已训练的 SASRec 模型权重。 |
+| `model-assets/standard_cache.pkl` | 配套 RecBole 配置、处理后的数据集、商品／用户 ID 映射与序列；当前推理服务需要它。 |
+| `model-assets/electronics.item` | 商品 ID、标题和商品属性。 |
+| `data-import/electronics.inter` | 按需导入数据库的交互记录；加载已提供的模型和缓存不需要读取它。 |
+
+压缩包还包含中英文放置说明、部署资产配置片段、资产清单及 SHA256 校验值。Kubernetes 部署时，将 `model-assets/` 放到本仓库的 `local-assets/model-assets/`，并把包内资产配置合入本地部署配置，具体见[部署说明](docs/DEPLOYMENT.md)；本地 Python 服务的放置方式见包内 README。
+
+数据库准备方式见[运行环境说明](ENVIRONMENT.md)中的建表与数据导入指引；故障观测数据的转换和使用见[数据集工作流](#数据集工作流)。
+
 ### 2. 部署业务系统
 
 有可用 Kubernetes、镜像和模型资产时，从[独立部署说明](docs/DEPLOYMENT.md)创建一个新实例：
@@ -107,6 +114,8 @@ python scripts/entrypoints/check_recshop.py --config deployment.local.json
 
 已接受的正式样本按[迁移工具说明](scripts/dataset/README.md)冻结输入、导出已有历史观测、转换并读回。输出使用独立的 `runs/`、`outputs/` 目录，不覆盖原始数据或已有交付。
 
+迁移会自动补充版本化的路径关系、交互意图、故障角色和计划时间设计标签，沿用 strict255 已有标签取值；每次运行的实际窗口另行保留。字段含义见[设计标签说明](docs/DATA-FORMAT.md#design-labels)。
+
 V1 数据包包含样本身份、GT 映射、观测文件和来源记录。字段含义、模态可用性及分析适用范围见[数据格式说明](docs/DATA-FORMAT.md)。实验数据包作为独立输入，不随源码打包。
 
 ## 文档导航
@@ -119,6 +128,7 @@ V1 数据包包含样本身份、GT 映射、观测文件和来源记录。字�
 | 采集基础设施与环境身份 | [采集环境准备](docs/COLLECTION-ENVIRONMENT.md) |
 | 版本化场景、计划与采集入口 | [采集流程](docs/COLLECTION.md) |
 | 数据导出、转换与读回 | [迁移工具](scripts/dataset/README.md) |
+| 脚本用途、入口与使用状态 | [脚本索引](scripts/README.md) |
 | 样本身份、GT 与观测格式 | [数据格式](docs/DATA-FORMAT.md) |
 
 ## 边界与来源

@@ -80,7 +80,38 @@ to one entity. GT comes from the executed contract and must match SUMMARY.
 | Units/source | Metric-specific units; compatibility `source=prometheus` retains actual source in `labels.source_raw`. Observed, derived and missing remain distinct. |
 | Traces | 18-field full call-tree view preserves spans/parents. Separate flat compatibility view keeps one root/earliest span per trace and is not a complete graph. |
 | Logs | Capture source ID/raw reference resolve the producer; an associated root entity is not the producer. Preserve timestamp prefix and message. |
-| Audit | Preserve original QC, SUMMARY, annotation and accepted ledger byte-for-byte; unprovided role/path/interaction labels retain their missing state. |
+| Audit | Preserve original QC, SUMMARY, annotation and accepted ledger byte-for-byte, including their original missing labels. Delivery design labels are recorded separately. |
+
+### Design labels
+
+The converter automatically assigns `path_relation`, `interaction_pattern`, and
+each fault instance's `role` using the versioned
+[design mapping](../configs/dataset/design_labels.v1.json). Matching uses
+`design_version + scenario_id + fault_instance_id` and verifies fault type and
+target, so a new attempt of the same fixed design receives the same design labels.
+An unknown design or a changed instance signature is rejected explicitly.
+
+These fields describe the configured design and interaction intent:
+`annotation_provenance.annotation_basis` is `design_assigned`, and
+`empirical_interaction_certification` is `false`. They do not certify observed
+causal amplification or masking. Original observations, root entities, fault
+windows, acceptance and QC records are unchanged.
+
+All design-label values use the existing strict255 vocabulary.
+`composition_type` describes the current fixed design's planned injection
+windows: `none`, `simultaneous`, `nested`, `partial_overlap`, or `staggered`.
+Identical planned windows are simultaneous; an outer window containing all
+others is nested; otherwise any overlap is partial overlap, and disjoint
+windows are staggered. No additional timing category is introduced.
+
+`pair_time_relations` retains the original per-attempt time objects and evidence;
+`overlap_windows` exposes their intersections in the legacy dictionary format.
+These actual windows use successful operation-return bounds, not exact physical
+effect boundaries, and may differ from the planned timing label. The former
+class combination is preserved separately as `category_relation` (`none`,
+`intra_class`, or `cross_class`). Metadata, external ground truth and nested
+instance roles use the same label function. Runtime diagnostic results are not
+inferred from the design labels.
 
 Default `eval/` uses the 26 application/gateway candidates in `metric_views.py`,
 pre-fault/during-fault observations only, and excludes GT, scenario-selected

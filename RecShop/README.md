@@ -1,35 +1,27 @@
-<h1 align="center">RecShop</h1>
-
-<p align="center">RecShop is an e-commerce recommendation platform for research on microservice fault diagnosis.</p>
-
 <p align="center">
-  <a href="LICENSE.md"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-E11D48.svg?style=for-the-badge&amp;labelColor=334155"></a>
-  <a href="ENVIRONMENT.md"><img alt="Python 3.10" src="https://img.shields.io/badge/Python-3.10-B45309.svg?style=for-the-badge&amp;labelColor=334155"></a>
-  <a href="docs/DEPLOYMENT.md"><img alt="Deployment: Kubernetes" src="https://img.shields.io/badge/Deployment-Kubernetes-047857.svg?style=for-the-badge&amp;labelColor=334155"></a>
-  <a href="docs/COLLECTION-ENVIRONMENT.md"><img alt="Collection host: Windows" src="https://img.shields.io/badge/Collection%20host-Windows-7C3AED.svg?style=for-the-badge&amp;labelColor=334155"></a>
+  <img src="assets/readme/recshop-logo.png" alt="RecShop logo" width="720">
 </p>
 
-<p align="center"><strong>English</strong> · <a href="README_CN.md">简体中文</a></p>
+---
 
-<p align="center"><img src="assets/readme/rainbow-divider.svg" width="1000" height="6" alt=""></p>
+# RecShop
+
+*An e-commerce recommendation platform for microservice fault diagnosis research.*
+
+<p>
+  <a href="LICENSE.md"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-E11D48.svg?style=flat&amp;labelColor=334155"></a>
+  <a href="ENVIRONMENT.md"><img alt="Python 3.10" src="https://img.shields.io/badge/Python-3.10-B45309.svg?style=flat&amp;labelColor=334155"></a>
+  <a href="docs/DEPLOYMENT.md"><img alt="Deployment: Kubernetes" src="https://img.shields.io/badge/Deployment-Kubernetes-047857.svg?style=flat&amp;labelColor=334155"></a>
+  <a href="docs/COLLECTION-ENVIRONMENT.md"><img alt="Collection host: Windows" src="https://img.shields.io/badge/Collection%20host-Windows-7C3AED.svg?style=flat&amp;labelColor=334155"></a>
+</p>
+
+[Quickstart](#quickstart) | [Collection](docs/COLLECTION.md) | [Dataset Guide](docs/DATA-MIGRATION.md) | [简体中文](README_CN.md)
 
 The platform contains 25 application services: 24 Flask services and 1 FastAPI SASRec inference service. Most business services share MySQL. Recommendation workflows, model serving, and LLM reranking are business features, not fault-collection controllers. Internal module, image, and service identifiers retain compatibility names.
 
-## Architecture
+<a href="assets/figures/recshop-system-overview.png"><img src="assets/figures/recshop-system-overview.png" alt="RecShop system overview" width="1000"></a>
 
-### System Overview
-
-<img src="assets/figures/recshop-system-overview.png" alt="RecShop system overview" width="1000">
-
-[View the full-resolution system overview (3000 × 1639)](assets/figures/recshop-system-overview.png)
-
-### Service Dependencies
-
-<img src="assets/figures/recshop-service-dependencies.png" alt="RecShop service dependency graph" width="1000">
-
-[View the full-resolution dependency diagram (4200 × 1456)](assets/figures/recshop-service-dependencies.png)
-
-### Service Groups
+<a href="assets/figures/recshop-service-dependencies.png"><img src="assets/figures/recshop-service-dependencies.png" alt="RecShop service dependency graph" width="1000"></a>
 
 The 25 application services are grouped below. See the [full service guide](services/README.md) for ports and responsibilities.
 
@@ -72,6 +64,21 @@ You can also install the same complete dependency set with `python -m pip instal
 
 Copy `.env.example` to a local `.env` and supply your database settings, session key, and optional LLM configuration. Model weights, the RecBole cache, and item files are not included with the code. See [Assets and Environment](ENVIRONMENT.md) for sources, compatible file sets, and known checksums. Business APIs assume a trusted internal network; do not expose administrative and data endpoints publicly without isolation.
 
+#### Download Reproduction Assets
+
+[Download the reproduction asset package from Google Drive](https://drive.google.com/drive/folders/1oXmQEjIg4rRb9ivikw2tkI93fmr9AnCc?usp=sharing). Use `RecShop-reproduction-20261003.zip` (approximately 2.32 GiB), which contains the following external files:
+
+| File in the package | Contents and use |
+|---|---|
+| `model-assets/SASRec-Feb-24-2026_17-54-22.pth` | Trained SASRec model weights. |
+| `model-assets/standard_cache.pkl` | Matching RecBole configuration, processed dataset, item/user ID mappings, and sequences required by the current inference service. |
+| `model-assets/electronics.item` | Item IDs, titles, and catalog attributes. |
+| `data-import/electronics.inter` | Interaction records for optional database import; not required to load the supplied model and cache. |
+
+The archive also includes English and Chinese placement instructions, a deployment asset configuration fragment, an asset manifest, and SHA256 checksums. For Kubernetes deployment, copy `model-assets/` to `local-assets/model-assets/` in this repository and merge the supplied asset settings into your local deployment configuration; see [Deployment](docs/DEPLOYMENT.md). Local Python service placement is described in the archive README.
+
+For database preparation, follow the schema and data import instructions in [Environment](ENVIRONMENT.md). See [Dataset Workflow](#dataset-workflow) for fault-observation data conversion and usage.
+
 ### Deploy the Business System
 
 With Kubernetes, images, and model assets available, follow the [isolated deployment instructions](docs/DEPLOYMENT.md) to create a new instance:
@@ -107,6 +114,8 @@ Formal collection is explicitly started through `scripts/entrypoints/collect_dat
 
 For accepted formal samples, follow the [migration tool instructions](scripts/dataset/README.md) to freeze inputs, export existing historical observations, convert them, and read the results back. Use separate `runs/` and `outputs/` directories without overwriting raw data or existing deliveries.
 
+Conversion automatically adds versioned design labels for path relationships, interaction intent, fault roles and planned timing, using the existing strict255 label vocabulary. Actual per-attempt windows remain separate. See [label meanings](docs/DATA-FORMAT.md#design-labels).
+
 V1 data packages contain sample identities, GT mappings, observation files, and provenance records. See [Data Format](docs/DATA-FORMAT.md) for field definitions, modality availability, and the scope of supported analyses. Experimental data packages are separate inputs and are not bundled with the source code.
 
 ## Documentation
@@ -119,6 +128,7 @@ V1 data packages contain sample identities, GT mappings, observation files, and 
 | Collection infrastructure and environment binding | [Collection environment](docs/COLLECTION-ENVIRONMENT.md) |
 | Versioned scenarios, collection, and batch decisions | [Collection workflow](docs/COLLECTION.md) |
 | Dataset conversion and reading | [Migration tools](scripts/dataset/README.md) |
+| Script purposes, entry points, and maintenance tools | [Script guide](scripts/README.md) |
 | Dataset fields and analysis scope | [Data format](docs/DATA-FORMAT.md) |
 
 ## Scope and Attribution

@@ -29,7 +29,10 @@ python -B scripts/dataset/validate_dataset.py "$work/delivery" --hashes
    exporter does not create forwarding or change monitoring configuration.
 3. `build_dataset` consumes native evidence and cached matrices/receipts without
    network access. It rechecks selected identity, creates a new package, reads
-   back the records and writes V1 delivery status.
+   back the records and writes V1 delivery status. It also applies the bundled
+   versioned design-label mapping to both new and existing supported designs;
+   labels are keyed by design/scenario/instance signatures, not historical
+   attempt IDs. See [design-label semantics](DATA-FORMAT.md#design-labels).
 4. `validate_dataset` verifies a package from its own files. A completed package can
    move to another directory/computer without its original source tree. A separate
    reader distribution needs `validate_dataset.py`, `log_views.py`, `metric_views.py`.
