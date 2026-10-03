@@ -69,13 +69,13 @@ across samples; consult the individual dataset documentation.
 ## Data Download
 
 The data archives and collection code are maintained separately. Both datasets
-share the [RootMosaic dataset repository on Hugging Face](https://huggingface.co/datasets/RootMosaic/Anonymous).
+share the [RootMosaic dataset repository on Hugging Face]((https://huggingface.co/datasets/RootMosaic/Anonymous/tree/main)).
 Choose the archive for the system you want to use.
 
 | Dataset | Data release | Download |
 | --- | --- | --- |
-| RM-TT | 250 TrainTicket fault samples | [Hugging Face](https://huggingface.co/datasets/RootMosaic/Anonymous) |
-| RM-RS | 345 RecShop fault samples | [Hugging Face](https://huggingface.co/datasets/RootMosaic/Anonymous) |
+| RM-TT | 250 TrainTicket fault samples | [Hugging Face](https://huggingface.co/datasets/RootMosaic/Anonymous/tree/main) |
+| RM-RS | 345 RecShop fault samples | [Hugging Face](https://huggingface.co/datasets/RootMosaic/Anonymous/tree/main) |
 
 After downloading, use the entry points provided by each archive:
 
