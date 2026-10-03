@@ -1,23 +1,23 @@
-<h1 align="center">RootMosaic</h1>
-
-<p align="center"><strong>A Relation-Aware Benchmark for Diagnosing Multiple Root Causes in Microservice Systems</strong></p>
-
 <p align="center">
-  <img alt="Systems: 2" src="https://img.shields.io/badge/Systems-2-2563EB">
-  <img alt="Fault scenarios: 119" src="https://img.shields.io/badge/Fault%20scenarios-119-7C3AED">
-  <img alt="Fault samples: 595" src="https://img.shields.io/badge/Fault%20samples-595-059669">
-  <img alt="Telemetry: Metrics, Logs, Traces" src="https://img.shields.io/badge/Telemetry-Metrics%20%C2%B7%20Logs%20%C2%B7%20Traces-475569">
+  <img src="RecShop/assets/readme/rootmosaic-logo.png" alt="RootMosaic logo" width="720">
 </p>
 
-<p align="center">
-  <a href="#overview">Overview</a> ·
-  <a href="#datasets">Datasets</a> ·
-  <a href="https://huggingface.co/datasets/RootMosaic/Anonymous">Hugging Face Dataset</a> ·
-  <a href="#collection-code">Collection Code</a> ·
-  <a href="#evaluation">Evaluation</a>
+---
+
+# RootMosaic
+
+*A Relation-Aware Benchmark for Diagnosing Multiple Root Causes in Microservice Systems*
+
+<p>
+  <a href="#datasets"><img alt="Systems: 2" src="https://img.shields.io/badge/Systems-2-E11D48.svg?style=flat&amp;labelColor=334155"></a>
+  <a href="#datasets"><img alt="Fault scenarios: 119" src="https://img.shields.io/badge/Fault%20scenarios-119-B45309.svg?style=flat&amp;labelColor=334155"></a>
+  <a href="#datasets"><img alt="Fault samples: 595" src="https://img.shields.io/badge/Fault%20samples-595-047857.svg?style=flat&amp;labelColor=334155"></a>
+  <a href="#what-a-sample-contains"><img alt="Telemetry: Metrics, Logs, Traces" src="https://img.shields.io/badge/Telemetry-Metrics%20%C2%B7%20Logs%20%C2%B7%20Traces-7C3AED.svg?style=flat&amp;labelColor=334155"></a>
 </p>
 
-## Overview
+[Overview](#overview) | [Datasets](#datasets) | [Hugging Face Dataset](https://huggingface.co/datasets/RootMosaic/Anonymous) | [Collection Code](#collection-code) | [Evaluation](#evaluation)
+
+<a id="overview"></a>
 
 RootMosaic is a multimodal benchmark for root cause analysis (RCA) under single
 and multiple faults in microservice systems. It combines experiments on
@@ -32,6 +32,8 @@ annotations for more detailed analysis.
 
 This repository hosts the two systems' **deployment and data-collection code**.
 Dataset archives are distributed separately through Hugging Face.
+
+<a href="RecShop/assets/figures/rootmosaic-construction-pipeline.png"><img src="RecShop/assets/figures/rootmosaic-construction-pipeline.png" alt="RootMosaic dataset construction pipeline: scenario design, experiment execution, data collection, quality control, ground-truth annotation, and sample packaging" width="1000"></a>
 
 ## Datasets
 
@@ -69,7 +71,7 @@ across samples; consult the individual dataset documentation.
 ## Data Download
 
 The data archives and collection code are maintained separately. Both datasets
-share the [RootMosaic dataset repository on Hugging Face]((https://huggingface.co/datasets/RootMosaic/Anonymous/tree/main)).
+share the [RootMosaic dataset repository on Hugging Face](https://huggingface.co/datasets/RootMosaic/Anonymous/tree/main).
 Choose the archive for the system you want to use.
 
 | Dataset | Data release | Download |
